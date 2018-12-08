@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Custom Additions
+*.min.css
+*.min.js
+src/DashAccountingSystem/wwwroot/lib
+
+# Defaults from Visual Studio template .gitignore
+
 # User-specific files
 *.suo
 *.user
