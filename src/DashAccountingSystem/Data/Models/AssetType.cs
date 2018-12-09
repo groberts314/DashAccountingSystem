@@ -13,7 +13,7 @@ namespace DashAccountingSystem.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [MaxLength(255)]
         public string Name { get; set; }
 

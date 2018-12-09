@@ -9,10 +9,11 @@ namespace DashAccountingSystem.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public DbSet<Tenant> Tenant { get; set; }
+        public DbSet<AccountingPeriod> AccountingPeriod { get; set; }
+        public DbSet<Account> Account { get; set; }
         public DbSet<AccountType> AccountType { get; set; }
         public DbSet<AssetType> AssetType { get; set; }
-        public DbSet<AccountingPeriod> AccountingPeriod { get; set; }
+        public DbSet<Tenant> Tenant { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -49,6 +50,19 @@ namespace DashAccountingSystem.Data
 
             builder.Entity<AccountingPeriod>()
                 .HasIndex(ap => new { ap.TenantId, ap.Year, ap.Quarter });
+
+            builder.Entity<Account>()
+                .HasIndex(a => new { a.TenantId, a.AccountNumber })
+                .IsUnique();
+
+            builder.Entity<Account>()
+                .HasIndex(a => new { a.TenantId, a.Name })
+                .IsUnique();
+
+            builder.Entity<Account>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
 
             // Seed Data
             // FIXME: This isn't working.  EF seems stupid about identity/auto-generated columns no matter what you do. :-(
