@@ -51,25 +51,26 @@ namespace DashAccountingSystem.Data
                 .HasIndex(ap => new { ap.TenantId, ap.Year, ap.Quarter });
 
             // Seed Data
+            // FIXME: This isn't working.  EF seems stupid about identity/auto-generated columns no matter what you do. :-(
             /*
             builder.Entity<AccountType>()
                 .HasData(
-                    new AccountType() { Name = "Asset" },
-                    new AccountType() { Name = "Liability" },
-                    new AccountType() { Name = "Equity" },
-                    new AccountType() { Name = "Revenue" },
-                    new AccountType() { Name = "Expense" }
+                    new AccountType("Asset"),
+                    new AccountType("Liability"),
+                    new AccountType("Equity"),
+                    new AccountType("Revenue"),
+                    new AccountType("Expense")
                 );
 
             builder.Entity<AssetType>()
                 .HasData(
-                    new AssetType() { Name = "USD $" }
+                    new AssetType("USD $")
                 );
 
             builder.Entity<Tenant>()
                 .HasData(
-                    new Tenant() { Name = "Example Corporation" },
-                    new Tenant() { Name = "Dash Software Solutions, Inc." }
+                    new Tenant("Example Corporation"),
+                    new Tenant("Dash Software Solutions, Inc.")
                 );
             */
         }
