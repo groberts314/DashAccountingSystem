@@ -26,6 +26,10 @@ namespace DashAccountingSystem.Data.Models
 
         public DateTime? PostDate { get; set; }
 
+        [Required]
+        public int AccountingPeriodId { get; set; }
+        public AccountingPeriod AccountingPeriod { get; set; }
+
         public bool IsPending
         {
             get { return !PostDate.HasValue; }
@@ -36,6 +40,8 @@ namespace DashAccountingSystem.Data.Models
         public string Description { get; set; }
 
         public ushort? CheckNumber { get; set; }
+
+        public ICollection<JournalEntryAccount> Accounts { get; private set; } = new List<JournalEntryAccount>();
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
@@ -51,6 +57,7 @@ namespace DashAccountingSystem.Data.Models
         public JournalEntry(
             int tenantId,
             int entryId,
+            int accountingPeriodId,
             DateTime entryDate,
             DateTime? postDate,
             string description,
@@ -60,6 +67,7 @@ namespace DashAccountingSystem.Data.Models
         {
             TenantId = tenantId;
             EntryId = entryId;
+            AccountingPeriodId = accountingPeriodId;
             EntryDate = entryDate;
             PostDate = postDate;
             Description = description;

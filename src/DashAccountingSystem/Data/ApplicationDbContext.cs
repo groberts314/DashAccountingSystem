@@ -14,6 +14,7 @@ namespace DashAccountingSystem.Data
         public DbSet<AccountType> AccountType { get; set; }
         public DbSet<AssetType> AssetType { get; set; }
         public DbSet<JournalEntry> JournalEntry { get; set; }
+        public DbSet<JournalEntryAccount> JournalEntryAccount { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
