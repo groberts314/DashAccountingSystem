@@ -13,6 +13,7 @@ namespace DashAccountingSystem.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
+        [Required]
         public int TenantId { get; private set; }
         public Tenant Tenant { get; private set; }
 

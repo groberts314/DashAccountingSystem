@@ -17,6 +17,7 @@ namespace DashAccountingSystem.Data.Models
         // Navigation Properties
         public ICollection<AccountingPeriod> AccountingPeriods { get; } = new List<AccountingPeriod>();
         public ICollection<Account> Accounts { get; } = new List<Account>();
+        public ICollection<JournalEntry> JournalEntries { get; } = new List<JournalEntry>();
 
         public Tenant(string name)
         {

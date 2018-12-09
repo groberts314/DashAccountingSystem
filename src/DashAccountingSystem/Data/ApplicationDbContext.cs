@@ -13,6 +13,7 @@ namespace DashAccountingSystem.Data
         public DbSet<Account> Account { get; set; }
         public DbSet<AccountType> AccountType { get; set; }
         public DbSet<AssetType> AssetType { get; set; }
+        public DbSet<JournalEntry> JournalEntry { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -60,6 +61,15 @@ namespace DashAccountingSystem.Data
                 .IsUnique();
 
             builder.Entity<Account>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+
+            builder.Entity<JournalEntry>()
+                .HasIndex(je => new { je.TenantId, je.EntryId })
+                .IsUnique();
+
+            builder.Entity<JournalEntry>()
                 .Property("Created")
                 .HasColumnType("TIMESTAMP")
                 .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
