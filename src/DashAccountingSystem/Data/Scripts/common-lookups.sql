@@ -1,0 +1,27 @@
+DO $$
+BEGIN
+    -- AccountType
+    INSERT INTO "AccountType" ( "Name" )
+    SELECT acct_type_name
+    FROM UNNEST ( ARRAY [
+        'Asset',
+        'Liability',
+        'Equity',
+        'Revenue',
+        'Expense',
+        'Contra'
+    ] ) acct_type_name
+    WHERE NOT EXISTS ( SELECT 1 FROM "AccountType" WHERE "Name" = acct_type_name );
+
+    -- AssetType
+    INSERT INTO "AssetType" ( "Name" )
+    SELECT asset_type_name
+    FROM UNNEST ( ARRAY [
+        'USD $',
+        'GBP £',
+        'EUR €',
+        'JPY ¥'
+    ] ) asset_type_name
+    WHERE NOT EXISTS ( SELECT 1 FROM "AssetType" WHERE "Name" = asset_type_name );
+END
+$$ LANGUAGE plpgsql;
