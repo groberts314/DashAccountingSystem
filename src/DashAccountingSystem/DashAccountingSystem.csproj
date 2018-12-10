@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Data\Scripts\" />
+    <Folder Include="Security\Authentication\" />
+    <Folder Include="Security\Authorization\" />
   </ItemGroup>
 
 </Project>

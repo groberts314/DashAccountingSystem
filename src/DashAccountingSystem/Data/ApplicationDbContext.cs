@@ -7,7 +7,7 @@ using DashAccountingSystem.Data.Models;
 
 namespace DashAccountingSystem.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<AccountingPeriod> AccountingPeriod { get; set; }
         public DbSet<Account> Account { get; set; }

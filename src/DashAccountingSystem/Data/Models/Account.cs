@@ -46,12 +46,12 @@ namespace DashAccountingSystem.Data.Models
 
         [Required]
         public string CreatedById { get; private set; }
-        public IdentityUser CreatedBy { get; private set; }
+        public ApplicationUser CreatedBy { get; private set; }
 
         public DateTime? Updated { get; set; }
 
         public string UpdatedById { get; private set; }
-        public IdentityUser UpdatedBy { get; private set; }
+        public ApplicationUser UpdatedBy { get; private set; }
 
         public DateTime BalanceUpdated { get; set; }
 
