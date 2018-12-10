@@ -335,3 +335,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+src/DashAccountingSystem/Data/Scripts/dash-chart-of-accounts\.sql
