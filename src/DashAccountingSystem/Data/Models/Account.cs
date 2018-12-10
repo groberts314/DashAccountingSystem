@@ -55,6 +55,11 @@ namespace DashAccountingSystem.Data.Models
 
         public DateTime BalanceUpdated { get; set; }
 
+        public string DisplayName
+        {
+            get { return $"{AccountNumber} = {Name}"; }
+        }
+
         public bool IsBalanceNormal
         {
             get
