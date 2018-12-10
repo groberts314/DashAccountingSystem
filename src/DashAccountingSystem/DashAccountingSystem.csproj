@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Scripts\" />
     <Folder Include="Data\Repositories\" />
   </ItemGroup>
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace DashAccountingSystem.Data.Models
 {
@@ -43,7 +44,14 @@ namespace DashAccountingSystem.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Created { get; private set; }
 
+        [Required]
+        public string CreatedById { get; private set; }
+        public IdentityUser CreatedBy { get; private set; }
+
         public DateTime? Updated { get; set; }
+
+        public string UpdatedById { get; private set; }
+        public IdentityUser UpdatedBy { get; private set; }
 
         public DateTime BalanceUpdated { get; set; }
 
@@ -71,7 +79,8 @@ namespace DashAccountingSystem.Data.Models
             string description,
             int accountTypeId,
             int assetTypeId,
-            BalanceType normalBalanceType)
+            BalanceType normalBalanceType,
+            string createdById)
         {
             TenantId = tenantId;
             AccountNumber = accountNumber;
@@ -80,6 +89,8 @@ namespace DashAccountingSystem.Data.Models
             AccountTypeId = accountTypeId;
             AssetTypeId = assetTypeId;
             NormalBalanceType = normalBalanceType;
+            CreatedById = createdById;
+
             CurrentBalance = 0.0m;
         }
     }

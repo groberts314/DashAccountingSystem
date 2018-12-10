@@ -51,6 +51,11 @@ namespace DashAccountingSystem.Data.Models
         public string EnteredById { get; private set; }
         public IdentityUser EnteredBy { get; private set; }
 
+        public DateTime? Updated { get; set; }
+
+        public string UpdatedById { get; private set; }
+        public IdentityUser UpdatedBy { get; private set; }
+
         public string PostedById { get; private set; }
         public IdentityUser PostedBy { get; private set; }
 
