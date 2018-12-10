@@ -48,7 +48,7 @@ namespace DashAccountingSystem
 
             // Build Connection String by including DbPassword from User Secrets
             var builder = new NpgsqlConnectionStringBuilder(
-            Configuration.GetConnectionString("DefaultConnection"));
+                Configuration.GetConnectionString("DefaultConnection"));
             builder.Password = Configuration["DbPassword"];
             _connectionString = builder.ConnectionString;
 
