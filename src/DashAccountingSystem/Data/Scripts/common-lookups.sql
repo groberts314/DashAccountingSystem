@@ -11,7 +11,7 @@ BEGIN
         'Expense',
         'Contra'
     ] ) acct_type_name
-    WHERE NOT EXISTS ( SELECT 1 FROM "AccountType" WHERE "Name" = acct_type_name );
+    WHERE NOT EXISTS ( SELECT 1 FROM "AccountType" WHERE LOWER("Name") = LOWER(acct_type_name) );
 
     -- AssetType
     INSERT INTO "AssetType" ( "Name" )
@@ -22,6 +22,6 @@ BEGIN
         'EUR €',
         'JPY ¥'
     ] ) asset_type_name
-    WHERE NOT EXISTS ( SELECT 1 FROM "AssetType" WHERE "Name" = asset_type_name );
+    WHERE NOT EXISTS ( SELECT 1 FROM "AssetType" WHERE LOWER("Name") = LOWER(asset_type_name) );
 END
 $$ LANGUAGE plpgsql;
