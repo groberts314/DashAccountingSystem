@@ -45,12 +45,12 @@ namespace DashAccountingSystem.Data.Models
         public DateTime Created { get; private set; }
 
         [Required]
-        public string CreatedById { get; private set; }
+        public Guid CreatedById { get; private set; }
         public ApplicationUser CreatedBy { get; private set; }
 
         public DateTime? Updated { get; set; }
 
-        public string UpdatedById { get; private set; }
+        public Guid? UpdatedById { get; private set; }
         public ApplicationUser UpdatedBy { get; private set; }
 
         public DateTime BalanceUpdated { get; set; }
@@ -85,7 +85,7 @@ namespace DashAccountingSystem.Data.Models
             int accountTypeId,
             int assetTypeId,
             BalanceType normalBalanceType,
-            string createdById)
+            Guid createdById)
         {
             TenantId = tenantId;
             AccountNumber = accountNumber;

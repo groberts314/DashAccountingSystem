@@ -19,6 +19,8 @@ using Npgsql;
 using DashAccountingSystem.Data;
 using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Extensions;
+using DashAccountingSystem.Security.Authentication;
+using DashAccountingSystem.Security.Authorization;
 
 namespace DashAccountingSystem
 {
@@ -68,9 +70,15 @@ namespace DashAccountingSystem
                 // PostgreSQL
                 options.UseNpgsql(_connectionString));
 
-            services.AddDefaultIdentity<ApplicationUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services
+                .AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<ApplicationRole>()
+                .AddRoleManager<ApplicationRoleManager>()
+                .AddUserManager<ApplicationUserManager>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
             services.AddMvc(config =>
             {

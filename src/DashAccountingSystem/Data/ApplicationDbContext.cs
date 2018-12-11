@@ -4,10 +4,11 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DashAccountingSystem.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         public DbSet<AccountingPeriod> AccountingPeriod { get; set; }
         public DbSet<Account> Account { get; set; }

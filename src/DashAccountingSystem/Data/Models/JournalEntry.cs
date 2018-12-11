@@ -48,15 +48,15 @@ namespace DashAccountingSystem.Data.Models
         public DateTime Created { get; private set; }
 
         [Required]
-        public string EnteredById { get; private set; }
+        public Guid EnteredById { get; private set; }
         public ApplicationUser EnteredBy { get; private set; }
 
         public DateTime? Updated { get; set; }
 
-        public string UpdatedById { get; private set; }
+        public Guid? UpdatedById { get; private set; }
         public ApplicationUser UpdatedBy { get; private set; }
 
-        public string PostedById { get; private set; }
+        public Guid? PostedById { get; private set; }
         public ApplicationUser PostedBy { get; private set; }
 
         public JournalEntry(
@@ -67,8 +67,8 @@ namespace DashAccountingSystem.Data.Models
             DateTime? postDate,
             string description,
             ushort? checkNumber,
-            string enteredById,
-            string postedById)
+            Guid enteredById,
+            Guid? postedById)
         {
             TenantId = tenantId;
             EntryId = entryId;

@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION make_account (
     ,IN the_account_type_id INTEGER
     ,IN the_asset_type_id INTEGER
     ,IN the_normal_balance_type SMALLINT
-    ,IN created_by_user_id TEXT
+    ,IN created_by_user_id UUID
 )
 RETURNS INTEGER
 AS $$

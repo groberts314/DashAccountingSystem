@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DashAccountingSystem.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181209221734_Account")]
-    partial class Account
+    [Migration("20181211003343_InitialSchema")]
+    partial class InitialSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,8 @@ namespace DashAccountingSystem.Data.Migrations
                         .HasColumnType("TIMESTAMP")
                         .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
 
+                    b.Property<Guid>("CreatedById");
+
                     b.Property<decimal>("CurrentBalance");
 
                     b.Property<string>("Description");
@@ -53,11 +55,17 @@ namespace DashAccountingSystem.Data.Migrations
 
                     b.Property<DateTime?>("Updated");
 
+                    b.Property<Guid?>("UpdatedById");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AccountTypeId");
 
                     b.HasIndex("AssetTypeId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("TenantId", "AccountNumber")
                         .IsUnique();
@@ -117,47 +125,15 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AccountType");
                 });
 
-            modelBuilder.Entity("DashAccountingSystem.Data.Models.AssetType", b =>
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.ApplicationRole", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("AssetType");
-                });
-
-            modelBuilder.Entity("DashAccountingSystem.Data.Models.Tenant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Tenant");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<string>("Description");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256);
@@ -174,28 +150,9 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.ApplicationUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ClaimType");
-
-                    b.Property<string>("ClaimValue");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
@@ -208,6 +165,16 @@ namespace DashAccountingSystem.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<DateTime?>("EmailConfirmedDate");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(70);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(70);
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -219,6 +186,8 @@ namespace DashAccountingSystem.Data.Migrations
                         .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash");
+
+                    b.Property<DateTime?>("PhoneConfirmedDate");
 
                     b.Property<string>("PhoneNumber");
 
@@ -243,7 +212,119 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.AssetType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("AssetType");
+                });
+
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.JournalEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccountingPeriodId");
+
+                    b.Property<int?>("CheckNumber");
+
+                    b.Property<DateTime>("Created")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("TIMESTAMP")
+                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048);
+
+                    b.Property<Guid>("EnteredById");
+
+                    b.Property<DateTime>("EntryDate");
+
+                    b.Property<int>("EntryId");
+
+                    b.Property<DateTime?>("PostDate");
+
+                    b.Property<Guid?>("PostedById");
+
+                    b.Property<int>("TenantId");
+
+                    b.Property<DateTime?>("Updated");
+
+                    b.Property<Guid?>("UpdatedById");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountingPeriodId");
+
+                    b.HasIndex("EnteredById");
+
+                    b.HasIndex("PostedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("TenantId", "EntryId")
+                        .IsUnique();
+
+                    b.ToTable("JournalEntry");
+                });
+
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.JournalEntryAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccountId");
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<int>("AssetTypeId");
+
+                    b.Property<int>("JournalEntryId");
+
+                    b.Property<decimal?>("NewBalance");
+
+                    b.Property<decimal?>("PreviousBalance");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("AssetTypeId");
+
+                    b.HasIndex("JournalEntryId");
+
+                    b.ToTable("JournalEntryAccount");
+                });
+
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tenant");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -252,8 +333,25 @@ namespace DashAccountingSystem.Data.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<Guid>("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("Id");
 
@@ -262,7 +360,7 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128);
@@ -272,8 +370,7 @@ namespace DashAccountingSystem.Data.Migrations
 
                     b.Property<string>("ProviderDisplayName");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -282,11 +379,11 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<Guid>("UserId");
 
-                    b.Property<string>("RoleId");
+                    b.Property<Guid>("RoleId");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -295,9 +392,9 @@ namespace DashAccountingSystem.Data.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<Guid>("UserId");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128);
@@ -324,10 +421,19 @@ namespace DashAccountingSystem.Data.Migrations
                         .HasForeignKey("AssetTypeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("DashAccountingSystem.Data.Models.Tenant", "Tenant")
                         .WithMany("Accounts")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
                 });
 
             modelBuilder.Entity("DashAccountingSystem.Data.Models.AccountingPeriod", b =>
@@ -338,46 +444,90 @@ namespace DashAccountingSystem.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.JournalEntry", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("DashAccountingSystem.Data.Models.AccountingPeriod", "AccountingPeriod")
+                        .WithMany()
+                        .HasForeignKey("AccountingPeriodId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "EnteredBy")
+                        .WithMany()
+                        .HasForeignKey("EnteredById")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "PostedBy")
+                        .WithMany()
+                        .HasForeignKey("PostedById");
+
+                    b.HasOne("DashAccountingSystem.Data.Models.Tenant", "Tenant")
+                        .WithMany("JournalEntries")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+                });
+
+            modelBuilder.Entity("DashAccountingSystem.Data.Models.JournalEntryAccount", b =>
+                {
+                    b.HasOne("DashAccountingSystem.Data.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.AssetType", "AssetType")
+                        .WithMany()
+                        .HasForeignKey("AssetTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DashAccountingSystem.Data.Models.JournalEntry", "JournalEntry")
+                        .WithMany("Accounts")
+                        .HasForeignKey("JournalEntryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
