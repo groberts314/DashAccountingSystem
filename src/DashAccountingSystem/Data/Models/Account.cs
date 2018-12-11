@@ -39,7 +39,7 @@ namespace DashAccountingSystem.Data.Models
         public BalanceType NormalBalanceType { get; private set; }
 
         [Required]
-        public decimal CurrentBalance { get; private set; }
+        public decimal CurrentBalance { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Created { get; private set; }

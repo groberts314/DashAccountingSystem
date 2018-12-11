@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Dapper;
 using Npgsql;
 using Xunit;
-using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
 
 namespace DashAccountingSystem.Tests
@@ -105,7 +102,7 @@ namespace DashAccountingSystem.Tests
         private IAccountingPeriodRepository GetAccountingPeriodRepository()
         {
             var config = TestUtilities.GetConfiguration();
-            var appDbContext = TestUtilities.GetDatabaseContext().Result;
+            var appDbContext = TestUtilities.GetDatabaseContextAsync().Result;
             return new AccountingPeriodRepository(appDbContext);
         }
     }

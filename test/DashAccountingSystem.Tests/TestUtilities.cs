@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using DashAccountingSystem.Data;
 using Npgsql;
+using DashAccountingSystem.Data;
 
 namespace DashAccountingSystem.Tests
 {
@@ -44,7 +42,7 @@ namespace DashAccountingSystem.Tests
             return _connectionString.Value;
         }
 
-        internal static async Task<ApplicationDbContext> GetDatabaseContext()
+        internal static async Task<ApplicationDbContext> GetDatabaseContextAsync()
         {
             var connectionString = GetConnectionString();
 

@@ -33,8 +33,21 @@ namespace DashAccountingSystem.Data.Models
             get { return Amount >= 0.0m ? BalanceType.Debit : BalanceType.Credit; }
         }
 
-        public decimal? PreviousBalance { get; private set; }
+        public decimal? PreviousBalance { get; set; }
 
-        public decimal? NewBalance { get; private set; }
+        public decimal? NewBalance { get; set; }
+
+        public JournalEntryAccount(int accountId, decimal amount, int assetTypeId)
+        {
+            AccountId = accountId;
+            Amount = amount;
+            AssetTypeId = assetTypeId;
+        }
+
+        public JournalEntryAccount(int journalEntryId, int accountId, decimal amount, int assetTypeId)
+            : this (accountId, amount, assetTypeId)
+        {
+            JournalEntryId = journalEntryId;
+        }
     }
 }

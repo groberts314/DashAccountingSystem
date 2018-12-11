@@ -16,6 +16,23 @@ namespace DashAccountingSystem.Data.Repositories
             _db = applicationDbContext;
         }
 
+        public async Task<Account> CreateAccountAsync(Account account)
+        {
+            account.BalanceUpdated = DateTime.UtcNow;
+            await _db.Account.AddAsync(account);
+            await _db.SaveChangesAsync();
+            return await GetAccountByIdAsync(account.Id);
+        }
+
+        public async Task<Account> GetAccountByIdAsync(int accountId)
+        {
+            return await _db
+                .Account
+                .Include("AccountType")
+                .Include("AssetType")
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+        }
+
         public async Task<IEnumerable<Account>> GetAccountsByTenantAsync(int tenantId)
         {
             return await _db
@@ -26,6 +43,31 @@ namespace DashAccountingSystem.Data.Repositories
                 .OrderBy(a => a.AccountTypeId)
                 .ThenBy(a => a.AccountNumber)
                 .ToListAsync();
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsAsync(int accountId, int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByDateRangeAsync(int accountId, DateTime dateRangeStart, DateTime dateRangeEnd)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByMonthAsync(int accountId, int year, byte month)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByPeriodAsync(int accountId, int accountingPeriodId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByQuarterAsync(int accountId, int year, byte quarter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

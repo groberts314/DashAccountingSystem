@@ -28,7 +28,7 @@ namespace DashAccountingSystem.Data.Models
 
         [Required]
         public int AccountingPeriodId { get; set; }
-        public AccountingPeriod AccountingPeriod { get; set; }
+        public AccountingPeriod AccountingPeriod { get; private set; }
 
         public bool IsPending
         {
@@ -56,7 +56,7 @@ namespace DashAccountingSystem.Data.Models
         public Guid? UpdatedById { get; private set; }
         public ApplicationUser UpdatedBy { get; private set; }
 
-        public Guid? PostedById { get; private set; }
+        public Guid? PostedById { get; set; }
         public ApplicationUser PostedBy { get; private set; }
 
         public JournalEntry(

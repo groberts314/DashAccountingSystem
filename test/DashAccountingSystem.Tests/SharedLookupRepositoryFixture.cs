@@ -1,8 +1,4 @@
-using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Xunit;
-using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
 
 namespace DashAccountingSystem.Tests
@@ -39,7 +35,7 @@ namespace DashAccountingSystem.Tests
 
         private ISharedLookupRepository GetSharedLookupRepository()
         {
-            var appDbContext = TestUtilities.GetDatabaseContext().Result;
+            var appDbContext = TestUtilities.GetDatabaseContextAsync().Result;
             return new SharedLookupRepository(appDbContext);
         }
     }
