@@ -11,22 +11,42 @@ namespace DashAccountingSystem.Tests
 {
     public static class TestUtilities
     {
-        internal static IConfiguration GetConfiguration<TFixture>() where TFixture : class
+        internal static object DatabaseSyncLock = new object();
+
+        private static Lazy<IConfiguration> _configuration = new Lazy<IConfiguration>(LoadConfiguration);
+        private static Lazy<string> _connectionString = new Lazy<string>(InitializeConnectionString);
+
+        private static IConfiguration LoadConfiguration()
         {
             return new ConfigurationBuilder()
                 .AddJsonFile("config.json", optional: false)
-                .AddUserSecrets<TFixture>()
+                .AddUserSecrets<SharedLookupRepositoryFixture>() // any non-static class in this project will do
                 .Build();
         }
 
-        internal static async Task<ApplicationDbContext> GetDatabaseContext(IConfiguration config)
+        private static string InitializeConnectionString()
         {
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(
-                config.GetConnectionString("DefaultConnection"));
+                _configuration.Value.GetConnectionString("DefaultConnection"));
 
-            connectionStringBuilder.Password = config["DbPassword"];
+            connectionStringBuilder.Password = _configuration.Value["DbPassword"];
 
-            var connectionString = connectionStringBuilder.ConnectionString;
+            return connectionStringBuilder.ConnectionString;
+        }
+
+        internal static IConfiguration GetConfiguration()
+        {
+            return _configuration.Value;
+        }
+
+        internal static string GetConnectionString()
+        {
+            return _connectionString.Value;
+        }
+
+        internal static async Task<ApplicationDbContext> GetDatabaseContext()
+        {
+            var connectionString = GetConnectionString();
 
             DbContextOptions<ApplicationDbContext> options;
             var dbCtxOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();

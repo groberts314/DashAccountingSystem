@@ -39,8 +39,7 @@ namespace DashAccountingSystem.Tests
 
         private ISharedLookupRepository GetSharedLookupRepository()
         {
-            var config = TestUtilities.GetConfiguration<SharedLookupRepositoryFixture>();
-            var appDbContext = TestUtilities.GetDatabaseContext(config).Result;
+            var appDbContext = TestUtilities.GetDatabaseContext().Result;
             return new SharedLookupRepository(appDbContext);
         }
     }

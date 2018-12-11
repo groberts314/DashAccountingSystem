@@ -47,5 +47,12 @@ namespace DashAccountingSystem.Data.Models
             Name = $"{periodDate.ToString("MMMM")} {year}";
 
         }
+
+        public bool ContainsDate(DateTime date)
+        {
+            var periodStart = new DateTime(Year, Month, 1);
+            var periodEnd = periodStart.AddMonths(1);
+            return date >= periodStart && date < periodEnd;
+        }
     }
 }
