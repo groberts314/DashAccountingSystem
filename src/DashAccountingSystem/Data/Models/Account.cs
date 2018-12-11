@@ -57,7 +57,7 @@ namespace DashAccountingSystem.Data.Models
 
         public string DisplayName
         {
-            get { return $"{AccountNumber} = {Name}"; }
+            get { return $"{AccountNumber} - {Name}"; }
         }
 
         public bool IsBalanceNormal

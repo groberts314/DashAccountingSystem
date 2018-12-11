@@ -20,6 +20,8 @@ namespace DashAccountingSystem.Data.Repositories
         {
             return await _db
                 .Account
+                .Include("AccountType")
+                .Include("AssetType")
                 .Where(a => a.TenantId == tenantId)
                 .OrderBy(a => a.AccountTypeId)
                 .ThenBy(a => a.AccountNumber)

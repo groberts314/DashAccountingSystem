@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DashAccountingSystem.Data.Models.Account>
+
+@{
+    ViewData["Title"] = "Chart of Accounts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New Account</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Account
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Normal Balance
+            </th>
+            <th>
+                Current Blance
+            </th>
+            <th>
+                Balance Good?
+            </th>
+            <th>
+                Balance Updated
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DisplayName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountType.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NormalBalanceType)
+            </td>
+            <td>
+                @($"{item.AssetType.Name} {string.Format("{0:N2}", item.CurrentBalance)} ")
+            </td>
+            <td>
+                @(item.IsBalanceNormal ? "Yes" : "No")
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BalanceUpdated)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

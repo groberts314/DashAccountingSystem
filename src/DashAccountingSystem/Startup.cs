@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using DashAccountingSystem.Data;
 using DashAccountingSystem.Data.Models;
+using DashAccountingSystem.Data.Repositories;
 using DashAccountingSystem.Extensions;
 using DashAccountingSystem.Security.Authentication;
 using DashAccountingSystem.Security.Authorization;
@@ -79,6 +80,12 @@ namespace DashAccountingSystem
                 .AddDefaultTokenProviders();
 
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
+
+            services
+                .AddScoped<IAccountingPeriodRepository, AccountingPeriodRepository>()
+                .AddScoped<IAccountRepository, AccountRepository>()
+                .AddScoped<ISharedLookupRepository, SharedLookupRepository>()
+                .AddScoped<ITenantRepository, TenantRepository>();
 
             services.AddMvc(config =>
             {
