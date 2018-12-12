@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
@@ -14,7 +13,6 @@ namespace DashAccountingSystem.Tests
     {
         private Guid _userId;
         private int _tenantId = 0;
-        private List<int> _addedAccountIds = new List<int>();
 
         [Fact]
         [Trait("Category", "Requires Database")]
@@ -54,7 +52,6 @@ namespace DashAccountingSystem.Tests
 
                     Assert.NotNull(savedAccount);
                     Assert.True(savedAccount.Id > 0);
-                    _addedAccountIds.Add(savedAccount.Id);
                 }
                 finally
                 {
@@ -103,13 +100,15 @@ namespace DashAccountingSystem.Tests
 
             using (var connection = new NpgsqlConnection(connString))
             {
+                var parameters = new { _tenantId };
+
                 connection.Execute(@"
-                    DELETE FROM ""Account"" WHERE ""Id"" = ANY ( @_addedAccountIds );",
-                    new { _addedAccountIds });
+                    DELETE FROM ""Account"" WHERE ""TenantId"" = @_tenantId;",
+                    parameters);
 
                 connection.Execute(@"
                     DELETE FROM ""Tenant"" WHERE ""Id"" = @_tenantId;",
-                    new { _tenantId });
+                    parameters);
 
                 connection.Execute(@"
                     DO $$
@@ -133,8 +132,6 @@ namespace DashAccountingSystem.Tests
                         END IF;
                     END $$ LANGUAGE plpgsql;
                     ");
-
-                _addedAccountIds.Clear();
             }
         }
     }

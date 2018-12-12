@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace DashAccountingSystem.Data.Models
 {
@@ -19,7 +17,7 @@ namespace DashAccountingSystem.Data.Models
         public Tenant Tenant { get; private set; }
 
         [Required]
-        public int EntryId { get; private set; }
+        public int EntryId { get; set; }
 
         [Required]
         public DateTime EntryDate { get; private set; }
@@ -43,6 +41,17 @@ namespace DashAccountingSystem.Data.Models
 
         public ICollection<JournalEntryAccount> Accounts { get; private set; } = new List<JournalEntryAccount>();
 
+        public bool IsBalanced
+        {
+            get
+            {
+                if (!Accounts.Any())
+                    return true;
+
+                return Accounts.Select(acct => acct.Amount).Sum() == 0.0m;
+            }
+        }
+
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Created { get; private set; }
@@ -59,6 +68,9 @@ namespace DashAccountingSystem.Data.Models
         public Guid? PostedById { get; set; }
         public ApplicationUser PostedBy { get; private set; }
 
+        /// <summary>
+        /// Construct a Journal Entry, explicitly specifying Entry ID and Accounting Period ID
+        /// </summary>
         public JournalEntry(
             int tenantId,
             int entryId,
@@ -69,10 +81,32 @@ namespace DashAccountingSystem.Data.Models
             ushort? checkNumber,
             Guid enteredById,
             Guid? postedById)
+            : this(tenantId, entryDate, postDate, description, checkNumber, enteredById, postedById)
         {
-            TenantId = tenantId;
             EntryId = entryId;
             AccountingPeriodId = accountingPeriodId;
+        }
+
+        /// <summary>
+        /// Construct a Journal Entry, without explicitly specifying Entry ID and Accounting Period ID
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="Repositories.JournalEntryRepository"/> will auto-assign the next sequential
+        /// Entry ID for the Joural Entry's specified Tenant, and will assign the appropriate
+        /// Accounting Period as well when Creating (persisting) a new Journal Entry.
+        /// Accounting Period always refers to Post Date if specified (i.e. the Journal Entry is posted)
+        /// or otherwise Entry Date (i.e. if the Journal Entry is still pending).
+        /// </remarks>
+        public JournalEntry(
+            int tenantId,
+            DateTime entryDate,
+            DateTime? postDate,
+            string description,
+            ushort? checkNumber,
+            Guid enteredById,
+            Guid? postedById)
+        {
+            TenantId = tenantId;
             EntryDate = entryDate;
             PostDate = postDate;
             Description = description;

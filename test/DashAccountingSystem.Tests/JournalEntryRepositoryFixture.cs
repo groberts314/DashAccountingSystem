@@ -14,9 +14,6 @@ namespace DashAccountingSystem.Tests
     {
         private int _tenantId = 0;
         private Guid _userId;
-        private List<int> _addedAccountingPeriodIds = new List<int>();
-        private List<int> _addedAccountIds = new List<int>();
-        private List<int> _addedJournalEntryIds = new List<int>();
 
         [Fact]
         [Trait("Category", "Requires Database")]
@@ -26,6 +23,7 @@ namespace DashAccountingSystem.Tests
             {
                 try
                 {
+                    // ARRANGE
                     InitializeTenant();
                     InitializeUser();
 
@@ -53,17 +51,9 @@ namespace DashAccountingSystem.Tests
                         4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
 
                     var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
-                    var accountingPeriodRepo = GetAccountingPeriodRepository();
-                    var accountingPeriod = accountingPeriodRepo.FetchOrCreateAccountPeriodAsync(_tenantId, 2018, 12).Result;
-
-                    Assert.NotNull(accountingPeriod);
-                    Assert.True(accountingPeriod.Id > 0);
-                    _addedAccountingPeriodIds.Add(accountingPeriod.Id);
 
                     var journalEntry = new JournalEntry(
                         _tenantId,
-                        1,
-                        accountingPeriod.Id,
                         entryDate,
                         null,
                         "Payment for Invoice #1001",
@@ -73,17 +63,301 @@ namespace DashAccountingSystem.Tests
 
                     var transactionAmount = 10000.00m;
 
-                    journalEntry.Accounts.Add(new JournalEntryAccount(cashAccount.Id, transactionAmount, assetTypeUSD.Id));
-                    journalEntry.Accounts.Add(new JournalEntryAccount(revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
+                    journalEntry.Accounts.Add(new JournalEntryAccount(
+                        cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                    journalEntry.Accounts.Add(new JournalEntryAccount(
+                        revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
 
+                    var accountingPeriodRepo = GetAccountingPeriodRepository();
                     var journalEntryRepo = GetJournalEntryRepository(accountingPeriodRepo);
-                    var savedJournalEntry = journalEntryRepo.InsertJournalEntryAsync(journalEntry).Result;
+
+                    // ACT - INSERT THE JOURNAL ENTRY
+                    var savedJournalEntry = journalEntryRepo.CreateJournalEntryAsync(journalEntry).Result;
+
+                    // ASSERT all the things!
+                    Assert.NotNull(savedJournalEntry);
+                    Assert.True(savedJournalEntry.Id > 0);
+                    Assert.True(savedJournalEntry.EntryId > 0);
+                    Assert.NotNull(savedJournalEntry.AccountingPeriod);
+                    Assert.True(savedJournalEntry.AccountingPeriod.ContainsDate(entryDate));
+
+                    Assert.Equal(2, savedJournalEntry.Accounts.Count());
+                    Assert.All(savedJournalEntry.Accounts, jeAcct => Assert.NotNull(jeAcct?.Account));
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == cashAccount.Id &&
+                        jeAcct.Account.AccountNumber == cashAccount.AccountNumber &&
+                        jeAcct.Account.Name == cashAccount.Name &&
+                        jeAcct.Amount == transactionAmount);
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == revenueAccount.Id &&
+                        jeAcct.Account.AccountNumber == revenueAccount.AccountNumber &&
+                        jeAcct.Account.Name == revenueAccount.Name &&
+                        jeAcct.Amount == -transactionAmount);
+
+                    Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
+                    Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
+                    Assert.True(savedJournalEntry.IsBalanced);
+                    Assert.True(savedJournalEntry.IsPending);
+                }
+                finally
+                {
+                    Cleanup();
+                }
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void InsertPostedJournalEntry_Ok()
+        {
+            lock (TestUtilities.DatabaseSyncLock)
+            {
+                try
+                {
+                    // ARRANGE - SET UP A JOURNAL ENTRY THAT INCLUDES A POST DATE
+                    InitializeTenant();
+                    InitializeUser();
+
+                    var sharedLookupRepo = GetSharedLookupRepository();
+
+                    var accountTypeAsset = sharedLookupRepo
+                        .GetAccountTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "Asset");
+
+                    var assetTypeUSD = sharedLookupRepo
+                        .GetAssetTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "USD $");
+
+                    var cashAccount = MakeAccount(
+                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, BalanceType.Debit);
+
+                    var accountTypeRevenue = sharedLookupRepo
+                        .GetAccountTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "Revenue");
+
+                    var revenueAccount = MakeAccount(
+                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
+
+                    var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                    var postDate = entryDate.AddDays(3);
+
+                    var journalEntry = new JournalEntry(
+                        _tenantId,
+                        entryDate,
+                        postDate,
+                        "Payment for Invoice #1001",
+                        null,
+                        _userId,
+                        _userId);
+
+                    var transactionAmount = 10000.00m;
+
+                    journalEntry.Accounts.Add(
+                        new JournalEntryAccount(cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                    journalEntry.Accounts.Add(
+                        new JournalEntryAccount(revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
+
+                    var accountingPeriodRepo = GetAccountingPeriodRepository();
+                    var journalEntryRepo = GetJournalEntryRepository(accountingPeriodRepo);
+
+                    // ACT - CREATE THE POSTED JOURNAL ENTRY
+                    var savedJournalEntry = journalEntryRepo.CreateJournalEntryAsync(journalEntry).Result;
+
+                    // ASSERT all the things!
+                    // Including all the things about Posted Entries and affected Accounts!
+                    Assert.NotNull(savedJournalEntry);
+                    Assert.True(savedJournalEntry.Id > 0);
+                    Assert.True(savedJournalEntry.EntryId > 0);
+                    Assert.NotNull(savedJournalEntry.AccountingPeriod);
+                    Assert.True(savedJournalEntry.AccountingPeriod.ContainsDate(entryDate));
+
+                    Assert.Equal(2, savedJournalEntry.Accounts.Count());
+                    Assert.All(savedJournalEntry.Accounts, jeAcct => Assert.NotNull(jeAcct?.Account));
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == cashAccount.Id &&
+                        jeAcct.Account.AccountNumber == cashAccount.AccountNumber &&
+                        jeAcct.Account.Name == cashAccount.Name &&
+                        jeAcct.Amount == transactionAmount);
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == revenueAccount.Id &&
+                        jeAcct.Account.AccountNumber == revenueAccount.AccountNumber &&
+                        jeAcct.Account.Name == revenueAccount.Name &&
+                        jeAcct.Amount == -transactionAmount);
+
+                    Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
+                    Assert.True(savedJournalEntry.IsBalanced);
+                    Assert.False(savedJournalEntry.IsPending);
+                    Assert.NotNull(savedJournalEntry.PostDate);
+                    Assert.Equal(postDate, savedJournalEntry.PostDate);
+
+                    var updatedCashJournalEntryAccount = savedJournalEntry
+                        .Accounts
+                        .FirstOrDefault(jea => jea.AccountId == cashAccount.Id);
+
+                    Assert.NotNull(updatedCashJournalEntryAccount);
+                    Assert.NotNull(updatedCashJournalEntryAccount.Account);
+                    Assert.NotNull(updatedCashJournalEntryAccount.PreviousBalance);
+                    Assert.Equal(0.0m, updatedCashJournalEntryAccount.PreviousBalance);
+                    Assert.NotNull(updatedCashJournalEntryAccount.NewBalance);
+                    Assert.Equal(transactionAmount, updatedCashJournalEntryAccount.NewBalance);
+                    Assert.Equal(transactionAmount, updatedCashJournalEntryAccount.Account.CurrentBalance);
+                    Assert.True(updatedCashJournalEntryAccount.Account.IsBalanceNormal);
+                    Assert.True(updatedCashJournalEntryAccount.Account.BalanceUpdated > cashAccount.BalanceUpdated);
+
+                    var updatedRevenueJournalEntryAccount = savedJournalEntry
+                        .Accounts
+                        .FirstOrDefault(jea => jea.AccountId == revenueAccount.Id);
+
+                    Assert.NotNull(updatedRevenueJournalEntryAccount);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.Account);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.PreviousBalance);
+                    Assert.Equal(0.0m, updatedRevenueJournalEntryAccount.PreviousBalance);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.NewBalance);
+                    Assert.Equal(-transactionAmount, updatedRevenueJournalEntryAccount.NewBalance);
+                    Assert.Equal(-transactionAmount, updatedRevenueJournalEntryAccount.Account.CurrentBalance);
+                    Assert.True(updatedRevenueJournalEntryAccount.Account.IsBalanceNormal);
+                    Assert.True(updatedRevenueJournalEntryAccount.Account.BalanceUpdated > cashAccount.BalanceUpdated);
+
+                }
+                finally
+                {
+                    Cleanup();
+                }
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void PostJournalEntry_Ok()
+        {
+            lock (TestUtilities.DatabaseSyncLock)
+            {
+                try
+                {
+                    // ARRANGE - SET UP A PENDING JOURNAL ENTRY
+                    InitializeTenant();
+                    InitializeUser();
+
+                    var sharedLookupRepo = GetSharedLookupRepository();
+
+                    var accountTypeAsset = sharedLookupRepo
+                        .GetAccountTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "Asset");
+
+                    var assetTypeUSD = sharedLookupRepo
+                        .GetAssetTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "USD $");
+
+                    var cashAccount = MakeAccount(
+                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, BalanceType.Debit);
+
+                    var accountTypeRevenue = sharedLookupRepo
+                        .GetAccountTypesAsync()
+                        .Result
+                        .FirstOrDefault(at => at.Name == "Revenue");
+
+                    var revenueAccount = MakeAccount(
+                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
+
+                    var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+
+                    var journalEntry = new JournalEntry(
+                        _tenantId,
+                        entryDate,
+                        null,
+                        "Payment for Invoice #1001",
+                        null,
+                        _userId,
+                        null);
+
+                    var transactionAmount = 10000.00m;
+
+                    journalEntry.Accounts.Add(
+                        new JournalEntryAccount(cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                    journalEntry.Accounts.Add(
+                        new JournalEntryAccount(revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
+
+                    var accountingPeriodRepo = GetAccountingPeriodRepository();
+                    var journalEntryRepo = GetJournalEntryRepository(accountingPeriodRepo);
+
+                    var savedJournalEntry = journalEntryRepo.CreateJournalEntryAsync(journalEntry).Result;
 
                     Assert.NotNull(savedJournalEntry);
                     Assert.True(savedJournalEntry.Id > 0);
-                    _addedJournalEntryIds.Add(savedJournalEntry.Id);
+                    Assert.True(savedJournalEntry.EntryId > 0);
+                    Assert.NotNull(savedJournalEntry.AccountingPeriod);
+                    Assert.True(savedJournalEntry.AccountingPeriod.ContainsDate(entryDate));
 
-                    // TODO: More robust assertions
+                    Assert.Equal(2, savedJournalEntry.Accounts.Count());
+                    Assert.All(savedJournalEntry.Accounts, jeAcct => Assert.NotNull(jeAcct?.Account));
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == cashAccount.Id &&
+                        jeAcct.Account.AccountNumber == cashAccount.AccountNumber &&
+                        jeAcct.Account.Name == cashAccount.Name &&
+                        jeAcct.Amount == transactionAmount);
+
+                    Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == revenueAccount.Id &&
+                        jeAcct.Account.AccountNumber == revenueAccount.AccountNumber &&
+                        jeAcct.Account.Name == revenueAccount.Name &&
+                        jeAcct.Amount == -transactionAmount);
+
+                    Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
+                    Assert.True(savedJournalEntry.IsBalanced);
+                    Assert.True(savedJournalEntry.IsPending);
+
+                    // ACT - POST THE ENTRY
+                    var postDate = entryDate.AddDays(2);
+                    var postedJournalEntry = journalEntryRepo.PostJournalEntryAsync(
+                        savedJournalEntry.Id,
+                        postDate,
+                        _userId)
+                        .Result;
+
+                    // ASSERT All the Things!
+                    Assert.NotNull(postedJournalEntry);
+                    Assert.NotNull(postedJournalEntry.PostDate);
+                    Assert.Equal(postDate, postedJournalEntry.PostDate);
+                    Assert.False(postedJournalEntry.IsPending);
+
+                    var updatedCashJournalEntryAccount = postedJournalEntry
+                        .Accounts
+                        .FirstOrDefault(jea => jea.AccountId == cashAccount.Id);
+
+                    Assert.NotNull(updatedCashJournalEntryAccount);
+                    Assert.NotNull(updatedCashJournalEntryAccount.Account);
+                    Assert.NotNull(updatedCashJournalEntryAccount.PreviousBalance);
+                    Assert.Equal(0.0m, updatedCashJournalEntryAccount.PreviousBalance);
+                    Assert.NotNull(updatedCashJournalEntryAccount.NewBalance);
+                    Assert.Equal(transactionAmount, updatedCashJournalEntryAccount.NewBalance);
+                    Assert.Equal(transactionAmount, updatedCashJournalEntryAccount.Account.CurrentBalance);
+                    Assert.True(updatedCashJournalEntryAccount.Account.IsBalanceNormal);
+                    Assert.True(updatedCashJournalEntryAccount.Account.BalanceUpdated > cashAccount.BalanceUpdated);
+
+                    var updatedRevenueJournalEntryAccount = postedJournalEntry
+                        .Accounts
+                        .FirstOrDefault(jea => jea.AccountId == revenueAccount.Id);
+
+                    Assert.NotNull(updatedRevenueJournalEntryAccount);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.Account);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.PreviousBalance);
+                    Assert.Equal(0.0m, updatedRevenueJournalEntryAccount.PreviousBalance);
+                    Assert.NotNull(updatedRevenueJournalEntryAccount.NewBalance);
+                    Assert.Equal(-transactionAmount, updatedRevenueJournalEntryAccount.NewBalance);
+                    Assert.Equal(-transactionAmount, updatedRevenueJournalEntryAccount.Account.CurrentBalance);
+                    Assert.True(updatedRevenueJournalEntryAccount.Account.IsBalanceNormal);
+                    Assert.True(updatedRevenueJournalEntryAccount.Account.BalanceUpdated > cashAccount.BalanceUpdated);
+
                 }
                 finally
                 {
@@ -114,7 +388,6 @@ namespace DashAccountingSystem.Tests
 
             Assert.NotNull(savedAccount);
             Assert.True(savedAccount.Id > 0);
-            _addedAccountIds.Add(savedAccount.Id);
 
             return savedAccount;
         }
@@ -171,21 +444,26 @@ namespace DashAccountingSystem.Tests
 
             using (var connection = new NpgsqlConnection(connString))
             {
-                connection.Execute(@"
-                    DELETE FROM ""JournalEntryAccount"" WHERE ""JournalEntryId"" = ANY ( @_addedJournalEntryIds );",
-                    new { _addedJournalEntryIds });
+                var parameters = new { _tenantId };
 
                 connection.Execute(@"
-                    DELETE FROM ""JournalEntry"" WHERE ""Id"" = ANY ( @_addedJournalEntryIds );",
-                    new { _addedJournalEntryIds });
+                    DELETE FROM ""JournalEntryAccount""
+                    WHERE ""JournalEntryId"" IN (
+                        SELECT ""Id"" FROM ""JournalEntry"" WHERE ""TenantId"" = @_tenantId
+                    );",
+                    parameters);
 
                 connection.Execute(@"
-                    DELETE FROM ""Account"" WHERE ""Id"" = ANY ( @_addedAccountIds );",
-                    new { _addedAccountIds });
+                    DELETE FROM ""JournalEntry"" WHERE ""TenantId"" = @_tenantId;",
+                    parameters);
 
                 connection.Execute(@"
-                    DELETE FROM ""AccountingPeriod"" WHERE ""Id"" = ANY ( @_addedAccountingPeriodIds );",
-                    new { _addedAccountingPeriodIds });
+                    DELETE FROM ""Account"" WHERE ""TenantId"" = @_tenantId;",
+                    parameters);
+
+                connection.Execute(@"
+                    DELETE FROM ""AccountingPeriod"" WHERE ""TenantId"" = @_tenantId;",
+                    parameters);
 
                 connection.Execute(@"
                     DELETE FROM ""Tenant"" WHERE ""Id"" = @_tenantId;",
@@ -240,8 +518,6 @@ namespace DashAccountingSystem.Tests
                         END IF;
                     END $$ LANGUAGE plpgsql;
                     ");
-
-                _addedAccountIds.Clear();
             }
         }
     }

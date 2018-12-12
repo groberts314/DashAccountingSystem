@@ -16,6 +16,11 @@ namespace DashAccountingSystem.Data.Repositories
             _db = applicationDbContext;
         }
 
+        public async Task<AccountingPeriod> FetchOrCreateAccountPeriodAsync(int tenantId, DateTime date)
+        {
+            return await FetchOrCreateAccountPeriodAsync(tenantId, date.Year, (byte)date.Month);
+        }
+
         public async Task<AccountingPeriod> FetchOrCreateAccountPeriodAsync(int tenantId, int year, byte month)
         {
             var existingAccountingPeriod = await _db.AccountingPeriod

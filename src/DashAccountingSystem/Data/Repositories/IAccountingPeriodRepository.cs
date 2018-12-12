@@ -8,6 +8,7 @@ namespace DashAccountingSystem.Data.Repositories
 {
     public interface IAccountingPeriodRepository
     {
+        Task<AccountingPeriod> FetchOrCreateAccountPeriodAsync(int tenantId, DateTime date);
         Task<AccountingPeriod> FetchOrCreateAccountPeriodAsync(int tenantId, int year, byte month);
     }
 }

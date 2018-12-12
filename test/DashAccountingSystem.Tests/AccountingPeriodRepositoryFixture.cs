@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
@@ -10,7 +10,6 @@ namespace DashAccountingSystem.Tests
     public class AccountingPeriodRepositoryFixture
     {
         private int _tenantId = 0;
-        private List<int> _addedAccountingPeriodIds = new List<int>();
 
         [Fact]
         [Trait("Category", "Requires Database")]
@@ -26,19 +25,34 @@ namespace DashAccountingSystem.Tests
                     var repository = GetAccountingPeriodRepository();
                     var year = 2018;
                     var month = (byte)12;
-                    var accountingPeriod = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
-                    Assert.NotNull(accountingPeriod);
-                    Assert.True(accountingPeriod.Id > 0);
-                    _addedAccountingPeriodIds.Add(accountingPeriod.Id);
-                    Assert.Equal(_tenantId, accountingPeriod.TenantId);
-                    Assert.Equal(year, accountingPeriod.Year);
-                    Assert.Equal(month, accountingPeriod.Month);
+                    var accountingPeriod0 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
+                    Assert.NotNull(accountingPeriod0);
+                    Assert.True(accountingPeriod0.Id > 0);
+                    Assert.Equal(_tenantId, accountingPeriod0.TenantId);
+                    Assert.Equal(year, accountingPeriod0.Year);
+                    Assert.Equal(month, accountingPeriod0.Month);
 
-                    var fetchedAccountingPeriod = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
-                    Assert.Equal(accountingPeriod.Id, fetchedAccountingPeriod.Id);
-                    Assert.Equal(_tenantId, fetchedAccountingPeriod.TenantId);
-                    Assert.Equal(year, fetchedAccountingPeriod.Year);
-                    Assert.Equal(month, fetchedAccountingPeriod.Month);
+                    var fetchedAccountingPeriod0 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
+                    Assert.Equal(accountingPeriod0.Id, fetchedAccountingPeriod0.Id);
+                    Assert.Equal(_tenantId, fetchedAccountingPeriod0.TenantId);
+                    Assert.Equal(year, fetchedAccountingPeriod0.Year);
+                    Assert.Equal(month, fetchedAccountingPeriod0.Month);
+
+                    year = 2019;
+                    month = 1;
+                    var date = new DateTime(year, month, 27);
+                    var accountingPeriod1 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, date).Result;
+                    Assert.NotNull(accountingPeriod1);
+                    Assert.True(accountingPeriod1.Id > 0);
+                    Assert.Equal(_tenantId, accountingPeriod1.TenantId);
+                    Assert.Equal(year, accountingPeriod1.Year);
+                    Assert.Equal(month, accountingPeriod1.Month);
+
+                    var fetchedAccountingPeriod1 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, date).Result;
+                    Assert.Equal(accountingPeriod1.Id, fetchedAccountingPeriod1.Id);
+                    Assert.Equal(_tenantId, fetchedAccountingPeriod1.TenantId);
+                    Assert.Equal(year, fetchedAccountingPeriod1.Year);
+                    Assert.Equal(month, fetchedAccountingPeriod1.Month);
                 }
                 finally
                 {
@@ -64,13 +78,15 @@ namespace DashAccountingSystem.Tests
 
             using (var connection = new NpgsqlConnection(connString))
             {
+                var parameters = new { _tenantId };
+
                 connection.Execute(@"
-                    DELETE FROM ""AccountingPeriod"" WHERE ""Id"" = ANY ( @_addedAccountingPeriodIds );",
-                    new { _addedAccountingPeriodIds });
+                    DELETE FROM ""AccountingPeriod"" WHERE ""TenantId"" = @_tenantId;",
+                    parameters);
 
                 connection.Execute(@"
                     DELETE FROM ""Tenant"" WHERE ""Id"" = @_tenantId;",
-                    new { _tenantId });
+                    parameters);
 
                 connection.Execute(@"
                     DO $$
@@ -94,8 +110,6 @@ namespace DashAccountingSystem.Tests
                         END IF;
                     END $$ LANGUAGE plpgsql;
                     ");
-
-                _addedAccountingPeriodIds.Clear();
             }
         }
 
