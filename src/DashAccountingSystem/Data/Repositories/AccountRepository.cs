@@ -37,7 +37,7 @@ namespace DashAccountingSystem.Data.Repositories
         {
             return await _db
                 .Account
-                .Include(a => a.AssetType)
+                .Include(a => a.AccountType)
                 .Include(a => a.AssetType)
                 .Where(a => a.TenantId == tenantId)
                 .OrderBy(a => a.AccountTypeId)
