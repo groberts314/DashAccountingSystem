@@ -16,7 +16,7 @@ DECLARE
     BALANCE_TYPE_CREDIT SMALLINT := -1;
 
     -- Created By User
-    GEOFFREY TEXT := (SELECT "Id" FROM "AspNetUsers" WHERE "NormalizedUserName" = 'GROBERTS314@YAHOO.COM');
+    GEOFFREY UUID := (SELECT "Id" FROM "AspNetUsers" WHERE "NormalizedUserName" = 'GROBERTS314@YAHOO.COM');
 
     the_tenant_id INTEGER;
 BEGIN

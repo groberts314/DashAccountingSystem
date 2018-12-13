@@ -1,14 +1,21 @@
-﻿
+﻿@using DashAccountingSystem.Data.Models
+@model IEnumerable<Tenant>
 @{
     ViewData["Title"] = "My Home";
 }
 
 <h2>My Home</h2>
+<p>Choose an organization below to go to open the ledger:</p>
 
-<p>
-    This page should require an authenticated user.
-</p>
-<p>
-    Eventually this page will be the entry point to manage your tenant in Dash Software Solutions.
-</p>
-
+@foreach (var tenant in Model)
+{
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a asp-route="accountsIndex"
+               asp-route-tenantid="@tenant.Id"
+            >
+                @tenant.Name
+            </a>
+        </div>
+    </div>
+}

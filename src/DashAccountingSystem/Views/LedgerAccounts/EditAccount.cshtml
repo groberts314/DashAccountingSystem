@@ -1,0 +1,87 @@
+﻿@model DashAccountingSystem.Data.Models.Account
+
+@{
+    ViewData["Title"] = "EditAccount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>EditAccount</h2>
+
+<h4>Account</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditAccount">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TenantId" class="control-label"></label>
+                <select asp-for="TenantId" class="form-control" asp-items="ViewBag.TenantId"></select>
+                <span asp-validation-for="TenantId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccountNumber" class="control-label"></label>
+                <input asp-for="AccountNumber" class="form-control" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccountTypeId" class="control-label"></label>
+                <select asp-for="AccountTypeId" class="form-control" asp-items="ViewBag.AccountTypeId"></select>
+                <span asp-validation-for="AccountTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AssetTypeId" class="control-label"></label>
+                <select asp-for="AssetTypeId" class="form-control" asp-items="ViewBag.AssetTypeId"></select>
+                <span asp-validation-for="AssetTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NormalBalanceType" class="control-label"></label>
+                <select asp-for="NormalBalanceType" class="form-control"></select>
+                <span asp-validation-for="NormalBalanceType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrentBalance" class="control-label"></label>
+                <input asp-for="CurrentBalance" class="form-control" />
+                <span asp-validation-for="CurrentBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedById" class="control-label"></label>
+                <select asp-for="CreatedById" class="form-control" asp-items="ViewBag.CreatedById"></select>
+                <span asp-validation-for="CreatedById" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Updated" class="control-label"></label>
+                <input asp-for="Updated" class="form-control" />
+                <span asp-validation-for="Updated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedById" class="control-label"></label>
+                <select asp-for="UpdatedById" class="form-control" asp-items="ViewBag.UpdatedById"></select>
+                <span asp-validation-for="UpdatedById" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BalanceUpdated" class="control-label"></label>
+                <input asp-for="BalanceUpdated" class="form-control" />
+                <span asp-validation-for="BalanceUpdated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
