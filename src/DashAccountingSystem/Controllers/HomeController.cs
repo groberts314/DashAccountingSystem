@@ -14,6 +14,9 @@ namespace DashAccountingSystem.Controllers
     {
         public IActionResult Index()
         {
+            if (HttpContext.User?.Identity?.IsAuthenticated == true)
+                return RedirectToAction("Index", "MyHome");
+
             return View();
         }
 

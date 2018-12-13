@@ -84,6 +84,7 @@ namespace DashAccountingSystem
             services
                 .AddScoped<IAccountingPeriodRepository, AccountingPeriodRepository>()
                 .AddScoped<IAccountRepository, AccountRepository>()
+                .AddScoped<IJournalEntryRepository, JournalEntryRepository>()
                 .AddScoped<ISharedLookupRepository, SharedLookupRepository>()
                 .AddScoped<ITenantRepository, TenantRepository>();
 
