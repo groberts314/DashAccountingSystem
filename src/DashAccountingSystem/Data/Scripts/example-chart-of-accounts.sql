@@ -6,7 +6,6 @@ DECLARE
     ACCT_TYPE_EQUITY INTEGER := (SELECT "Id" FROM "AccountType" WHERE "Name" = 'Equity');
     ACCT_TYPE_REVENUE INTEGER := (SELECT "Id" FROM "AccountType" WHERE "Name" = 'Revenue');
     ACCT_TYPE_EXPENSE INTEGER := (SELECT "Id" FROM "AccountType" WHERE "Name" = 'Expense');
-    ACCT_TYPE_CONTRA INTEGER := (SELECT "Id" FROM "AccountType" WHERE "Name" = 'Contra');
 
     -- Asset Type for U.S. Dollars
     ASSET_TYPE_USD INTEGER := (SELECT "Id" FROM "AssetType" WHERE "Name" = 'USD $');

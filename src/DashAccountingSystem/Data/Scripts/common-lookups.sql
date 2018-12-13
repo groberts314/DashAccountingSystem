@@ -8,8 +8,7 @@ BEGIN
         'Liability',
         'Equity',
         'Revenue',
-        'Expense',
-        'Contra'
+        'Expense'
     ] ) acct_type_name
     WHERE NOT EXISTS ( SELECT 1 FROM "AccountType" WHERE LOWER("Name") = LOWER(acct_type_name) );
 
