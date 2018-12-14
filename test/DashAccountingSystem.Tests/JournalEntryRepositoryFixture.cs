@@ -99,7 +99,7 @@ namespace DashAccountingSystem.Tests
                     Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
                     Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
                     Assert.True(savedJournalEntry.IsBalanced);
-                    Assert.True(savedJournalEntry.IsPending);
+                    Assert.Equal(TransactionStatus.Pending, savedJournalEntry.Status);
                 }
                 finally
                 {
@@ -193,7 +193,7 @@ namespace DashAccountingSystem.Tests
 
                     Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
                     Assert.True(savedJournalEntry.IsBalanced);
-                    Assert.False(savedJournalEntry.IsPending);
+                    Assert.Equal(TransactionStatus.Posted, savedJournalEntry.Status);
                     Assert.NotNull(savedJournalEntry.PostDate);
                     Assert.Equal(postDate, savedJournalEntry.PostDate);
 
@@ -314,7 +314,7 @@ namespace DashAccountingSystem.Tests
 
                     Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
                     Assert.True(savedJournalEntry.IsBalanced);
-                    Assert.True(savedJournalEntry.IsPending);
+                    Assert.Equal(TransactionStatus.Pending, savedJournalEntry.Status);
 
                     // ACT - POST THE ENTRY
                     var postDate = entryDate.AddDays(2);
@@ -328,7 +328,7 @@ namespace DashAccountingSystem.Tests
                     Assert.NotNull(postedJournalEntry);
                     Assert.NotNull(postedJournalEntry.PostDate);
                     Assert.Equal(postDate, postedJournalEntry.PostDate);
-                    Assert.False(postedJournalEntry.IsPending);
+                    Assert.Equal(TransactionStatus.Posted, postedJournalEntry.Status);
 
                     var updatedCashJournalEntryAccount = postedJournalEntry
                         .Accounts

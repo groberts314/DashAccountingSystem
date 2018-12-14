@@ -24,20 +24,20 @@ namespace DashAccountingSystem.Data.Models
 
         public DateTime? PostDate { get; set; }
 
+        public DateTime? CancelDate { get; set; }
+
+        [Required]
+        public TransactionStatus Status { get; set; }
+
         [Required]
         public int AccountingPeriodId { get; set; }
         public AccountingPeriod AccountingPeriod { get; private set; }
-
-        public bool IsPending
-        {
-            get { return !PostDate.HasValue; }
-        }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(2048)]
         public string Description { get; set; }
 
-        public ushort? CheckNumber { get; set; }
+        public uint? CheckNumber { get; set; }
 
         public ICollection<JournalEntryAccount> Accounts { get; private set; } = new List<JournalEntryAccount>();
 
@@ -68,6 +68,9 @@ namespace DashAccountingSystem.Data.Models
         public Guid? PostedById { get; set; }
         public ApplicationUser PostedBy { get; private set; }
 
+        public Guid? CanceledById { get; set; }
+        public ApplicationUser CanceledBy { get; private set; }
+
         /// <summary>
         /// Construct a Journal Entry, explicitly specifying Entry ID and Accounting Period ID
         /// </summary>
@@ -78,7 +81,7 @@ namespace DashAccountingSystem.Data.Models
             DateTime entryDate,
             DateTime? postDate,
             string description,
-            ushort? checkNumber,
+            uint? checkNumber,
             Guid enteredById,
             Guid? postedById)
             : this(tenantId, entryDate, postDate, description, checkNumber, enteredById, postedById)
@@ -102,7 +105,7 @@ namespace DashAccountingSystem.Data.Models
             DateTime entryDate,
             DateTime? postDate,
             string description,
-            ushort? checkNumber,
+            uint? checkNumber,
             Guid enteredById,
             Guid? postedById)
         {
@@ -113,6 +116,7 @@ namespace DashAccountingSystem.Data.Models
             CheckNumber = checkNumber;
             EnteredById = enteredById;
             PostedById = postedById;
+            Status = postDate.HasValue ? TransactionStatus.Posted : TransactionStatus.Pending;
         }
     }
 }

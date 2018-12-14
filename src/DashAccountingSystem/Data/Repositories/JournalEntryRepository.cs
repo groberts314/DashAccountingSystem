@@ -158,14 +158,14 @@ namespace DashAccountingSystem.Data.Repositories
 
                 await _db.JournalEntry.AddAsync(entry);
                 await _db.SaveChangesAsync();
+                var persistedEntry = await GetByIdAsync(entry.Id);
 
-                if (entry.PostDate.HasValue)
-                {
-                    var persistedEntry = await GetByIdAsync(entry.Id);
+                if (entry.Status == TransactionStatus.Posted)
                     UpdateAccountsForPostedJournalEntry(persistedEntry);
-                    await _db.SaveChangesAsync();
-                }
+                else
+                    UpdateAccountsForPendingJournalEntry(persistedEntry);
 
+                await _db.SaveChangesAsync();
                 transaction.Commit();
             }
 
@@ -181,6 +181,7 @@ namespace DashAccountingSystem.Data.Repositories
 
             entry.PostDate = postDate;
             entry.PostedById = postedByUserId;
+            entry.Status = TransactionStatus.Posted;
 
             if (!entry.AccountingPeriod.ContainsDate(postDate))
             {
@@ -208,6 +209,23 @@ namespace DashAccountingSystem.Data.Repositories
                 account.NewBalance = newBalance;
                 account.Account.CurrentBalance = newBalance;
                 account.Account.BalanceUpdated = DateTime.UtcNow;
+            }
+        }
+
+        private void UpdateAccountsForPendingJournalEntry(JournalEntry entry)
+        {
+            foreach (var account in entry.Accounts)
+            {
+                if (account.AmountType == BalanceType.Debit)
+                {
+                    account.Account.PendingDebits =
+                        account.Account.PendingDebits ?? 0.0m + account.Amount;
+                }
+                else // Credit
+                {
+                    account.Account.PendingCredits =
+                        account.Account.PendingCredits ?? 0.0m + account.Amount;
+                }
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -54,6 +54,10 @@ namespace DashAccountingSystem.Data.Models
         public ApplicationUser UpdatedBy { get; private set; }
 
         public DateTime BalanceUpdated { get; set; }
+
+        public decimal? PendingDebits { get; set; }
+
+        public decimal? PendingCredits { get; set; }
 
         public string DisplayName
         {
