@@ -1,14 +1,13 @@
-﻿@model DashAccountingSystem.Data.Models.Account
+﻿@model DashAccountingSystem.Models.AccountDetailsViewModel
 
 @{
     ViewData["Title"] = "View";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>View</h2>
+<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
 <div>
-    <h4>Account</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -18,80 +17,85 @@
             @Html.DisplayFor(model => model.Tenant.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.AccountNumber)
+            @Html.DisplayNameFor(model => model.Account.AccountNumber)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.AccountNumber)
+            @Html.DisplayFor(model => model.Account.AccountNumber)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Account.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Account.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.Account.Description)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Description)
+            @Html.DisplayFor(model => model.Account.Description)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.AccountType)
+            @Html.DisplayNameFor(model => model.Account.AccountType)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.AccountType.Name)
+            @Html.DisplayFor(model => model.Account.AccountType.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.AssetType)
+            @Html.DisplayNameFor(model => model.Account.AssetType)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.AssetType.Name)
+            @Html.DisplayFor(model => model.Account.AssetType.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.NormalBalanceType)
+            @Html.DisplayNameFor(model => model.Account.NormalBalanceType)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.NormalBalanceType)
+            @Html.DisplayFor(model => model.Account.NormalBalanceType)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.CurrentBalance)
+            @Html.DisplayNameFor(model => model.Account.CurrentBalance)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.CurrentBalance)
+            @Html.DisplayFor(model => model.Account.CurrentBalance)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Created)
+            @Html.DisplayNameFor(model => model.Account.Created)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Created)
+            @Html.DisplayFor(model => model.Account.Created)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.CreatedBy)
+            @Html.DisplayNameFor(model => model.Account.CreatedBy)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.CreatedBy.FirstName)
+            @Html.DisplayFor(model => model.Account.CreatedBy.FirstName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Updated)
+            @Html.DisplayNameFor(model => model.Account.Updated)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Updated)
+            @Html.DisplayFor(model => model.Account.Updated)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.UpdatedBy)
+            @Html.DisplayNameFor(model => model.Account.UpdatedBy)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.UpdatedBy.FirstName)
+            @Html.DisplayFor(model => model.Account.UpdatedBy.FirstName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.BalanceUpdated)
+            @Html.DisplayNameFor(model => model.Account.BalanceUpdated)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.BalanceUpdated)
+            @Html.DisplayFor(model => model.Account.BalanceUpdated)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-route="editAccount"
+     asp-route-tenantid="@Model.Tenant.Id"
+     asp-route-accountid="@Model.Account.Id"
+    >
+        Edit
+    </a> |
+    <a asp-route="accountsIndex" asp-route-tenantid="@Model.Tenant.Id">Back to List</a>
 </div>

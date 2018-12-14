@@ -30,6 +30,7 @@ namespace DashAccountingSystem.Controllers
             // TODO: Either in here or in an attribute, verify authorization for the tenant
              
             var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
+
             var tenant = accounts.IsEmpty()
                 ? await _tenantRepository.GetTenantAsync(tenantId)
                 : accounts.Select(a => a.Tenant).First();
@@ -55,9 +56,14 @@ namespace DashAccountingSystem.Controllers
             // TODO: Either in here or in an attribute, verify authorization for the tenant
             var account = await _accountRepository.GetAccountByIdAsync(accountId);
 
-            // TODO: Get pending and recently posted transactions and assemble an appropriate view model
+            // TODO: If null then 404 not found
+            // TODO: If doesn't belong to selected tenant either 404 not found or 403 forbidden
 
-            return View(account);
+            // TODO: Get pending and recently posted transactions and enhance view model
+
+            var viewModel = new AccountDetailsViewModel(account);
+
+            return View(viewModel);
         }
 
         [HttpGet]
