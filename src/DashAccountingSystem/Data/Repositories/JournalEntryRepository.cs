@@ -27,7 +27,9 @@ namespace DashAccountingSystem.Data.Repositories
                 .Where(je => je.Id == journalEntryId)
                 .Include(je => je.AccountingPeriod)
                 .Include(je => je.CreatedBy)
+                .Include(je => je.UpdatedBy)
                 .Include(je => je.PostedBy)
+                .Include(je => je.CanceledBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
                 .FirstOrDefaultAsync();
@@ -42,7 +44,7 @@ namespace DashAccountingSystem.Data.Repositories
                     je.TenantId == tenantId)
                 .OrderByDescending(je => je.PostDate ?? je.EntryDate)
                 .ThenBy(je => je.Description)
-                .Skip(pageNumber * pageSize)
+                .Skip(pageNumber - 1 * pageSize)
                 .Take(pageSize)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.PostedBy)
@@ -108,6 +110,21 @@ namespace DashAccountingSystem.Data.Repositories
                 .JournalEntry
                 .Include(je => je.AccountingPeriod)
                 .Where(je => je.TenantId == tenantId && je.AccountingPeriod.Year == year)
+                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
+                .ThenBy(je => je.Description)
+                .Include(je => je.CreatedBy)
+                .Include(je => je.PostedBy)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.Account)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesAsync(int tenantId)
+        {
+            return await _db
+                .JournalEntry
+                .Include(je => je.AccountingPeriod)
+                .Where(je => je.TenantId == tenantId && je.Status == TransactionStatus.Pending)
                 .OrderByDescending(je => je.PostDate ?? je.EntryDate)
                 .ThenBy(je => je.Description)
                 .Include(je => je.CreatedBy)

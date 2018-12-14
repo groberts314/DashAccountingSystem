@@ -47,27 +47,42 @@ namespace DashAccountingSystem.Data.Repositories
                 .ToListAsync();
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsAsync(int accountId, int pageNumber, int pageSize)
+        public async Task<IEnumerable<JournalEntryAccount>> GetPendingTransactionsAsync(int accountId)
+        {
+            return await _db
+                .JournalEntryAccount
+                .Include(jeAcct => jeAcct.JournalEntry)
+                .Where(jeAcct =>
+                    jeAcct.AccountId == accountId &&
+                    jeAcct.JournalEntry.Status == TransactionStatus.Pending)
+                .OrderByDescending(jeAcct => jeAcct.JournalEntry.EntryDate)
+                .Include(jeAcct => jeAcct.JournalEntry.AccountingPeriod)
+                .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
+                .ToListAsync();
+
+        }
+
+        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsAsync(int accountId, int pageNumber, int pageSize)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByDateRangeAsync(int accountId, DateTime dateRangeStart, DateTime dateRangeEnd)
+        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByDateRangeAsync(int accountId, DateTime dateRangeStart, DateTime dateRangeEnd)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByMonthAsync(int accountId, int year, byte month)
+        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByMonthAsync(int accountId, int year, byte month)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByPeriodAsync(int accountId, int accountingPeriodId)
+        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByPeriodAsync(int accountId, int accountingPeriodId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetTransactionsByQuarterAsync(int accountId, int year, byte quarter)
+        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByQuarterAsync(int accountId, int year, byte quarter)
         {
             throw new NotImplementedException();
         }
