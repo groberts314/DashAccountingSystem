@@ -1,66 +1,104 @@
-﻿@using DashAccountingSystem.Data.Models
-@model IEnumerable<Account>
+﻿@using DashAccountingSystem.Models
+@model ChartOfAccountsViewModel
 
 @{
-    ViewData["Title"] = "Chart of Accounts";
+    ViewData["Title"] = Model.Tenant.Name + " - Chart of Accounts";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
-<p>
-    <a asp-route="Create">Create New Account</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Account
-            </th>
-            <th>
-                Type
-            </th>
-            <th>
-                Normal Balance
-            </th>
-            <th>
-                Current Blance
-            </th>
-            <th>
-                Balance Good?
-            </th>
-            <th>
-                Balance Updated
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DisplayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountType.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NormalBalanceType)
-            </td>
-            <td>
-                @($"{item.AssetType.Name} {string.Format("{0:N2}", item.CurrentBalance)} ")
-            </td>
-            <td>
-                @(item.IsBalanceNormal ? "Yes" : "No")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BalanceUpdated)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-            </td>
-        </tr>
+<div class="panel-group acct-category" id="acct-cat-accordion">
+    @{
+        int categoryIndex = 0, subCategoryIndex = 0;
+        string categoryKey = null, subCategoryKey = null;
+
+        foreach (var accountCategoryEntry in Model.Accounts)
+        {
+            categoryKey = accountCategoryEntry.Key.ToString().ToLower();
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#acct-cat-accordion" href="#collapse-@categoryKey">
+                            <span class="parent glyphicon glyphicon-plus"></span>
+                            @accountCategoryEntry.Key.GetDisplayName()
+                        </a> 
+                    </h3>
+                </div>
+                <div class="panel-collapse collapse@(categoryIndex == 0 ? " in" : null)" id="collapse-@categoryKey">
+                    <div class="panel-body">
+                        <div class="panel-group acct-sub-category" id="acct-@categoryKey-accordion">
+                            @{
+                                foreach (var accountSubCategoryEntry in accountCategoryEntry.Value)
+                                {
+                                    subCategoryKey = accountSubCategoryEntry.Key.ToString().ToLower();
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" data-parent="#acct-@categoryKey-accordion" href="#collapse-@subCategoryKey">
+                                                    <span class="child glyphicon glyphicon-plus"></span>
+                                                    @accountSubCategoryEntry.Key.GetDisplayName()
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse@(subCategoryIndex == 0 ? " in" : null)" id="collapse-@subCategoryKey">
+                                            <div class="panel-body">
+                                                <p>
+                                                    @accountSubCategoryEntry.Key.GetDisplayName() Accounts ...
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    ++subCategoryIndex;
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            subCategoryIndex = 0;
+            ++categoryIndex;
+        }
+    }
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        (function ($) {
+            $(document).ready(function () {
+                // Add minus icon for collapse element which is open by default
+                $(".acct-category .collapse.in").each(function () {
+                    $(this).siblings(".panel-heading").find(".parent.glyphicon").addClass("glyphicon-minus").removeClass("glyphicon-plus");
+                });
+
+                $(".acct-sub-category .collapse.in").each(function () {
+                    $(this).siblings(".panel-heading").find(".child.glyphicon").addClass("glyphicon-minus").removeClass("glyphicon-plus");
+                });
+
+                // Toggle plus minus icon on show hide of collapse element
+                $(".acct-category .collapse")
+                    .on('show.bs.collapse', function () {
+                        $(this).parent().find(".parent.glyphicon").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+                    })
+                    .on('hide.bs.collapse', function () {
+                        $(this).parent().find(".parent.glyphicon").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+                    });
+
+                $(".acct-sub-category .collapse")
+                    .on('show.bs.collapse', function (e) {
+                        e.stopPropagation();
+                        $(this).parent().find(".child.glyphicon").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+                    })
+                    .on('hide.bs.collapse', function (e) {
+                        e.stopPropagation();
+                        $(this).parent().find(".child.glyphicon").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+                    });
+            });
+        })(jQuery);
+    </script>
 }
-    </tbody>
-</table>

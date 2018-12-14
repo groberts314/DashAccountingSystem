@@ -1,0 +1,40 @@
+﻿@model DashAccountingSystem.Models.BaseTenantViewModel
+
+@{ 
+    var controller = ViewContext.RouteData.Values["Controller"];
+    var isActiveRoute = new string[] { "LedgerAccounts", "Journal", "Statements" }
+        .Select(route => new KeyValuePair<string, bool>(route, string.Equals(controller, route)))
+        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+}
+
+<div class="row">
+    <div class="col-sm-6">
+        <h2>@Model.SectionTitle</h2>
+    </div>
+    <div class="col-sm-6 masthead-tenant-name">
+        <h4>@Model.Tenant.Name</h4>
+    </div>
+</div>
+
+<div class="secondary-nav">
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="@(isActiveRoute["LedgerAccounts"] ? "active" : null)">
+            <a asp-route="accountsIndex"
+               asp-route-tenantid="@Model.Tenant.Id">
+                General Ledger
+            </a>
+        </li>
+        <li role="presentation" class="@(isActiveRoute["Journal"] ? "active" : null)">
+            <a asp-route="journalIndex"
+               asp-route-tenantid="@Model.Tenant.Id">
+                Journal
+            </a>
+        </li>
+        <li role="presentation" class="@(isActiveRoute["Statements"] ? "active" : null)">
+            <a asp-route="statementsIndex"
+               asp-route-tenantid="@Model.Tenant.Id">
+                Statements
+            </a>
+        </li>
+    </ul>
+</div>

@@ -16,6 +16,13 @@ namespace DashAccountingSystem.Data.Repositories
             _db = applicationDbContext;
         }
 
+        public async Task<Tenant> GetTenantAsync(int tenantId)
+        {
+            return await _db
+                .Tenant
+                .FirstOrDefaultAsync(t => t.Id == tenantId);
+        }
+
         public async Task<IEnumerable<Tenant>> GetTenantsAsync()
         {
             return await _db

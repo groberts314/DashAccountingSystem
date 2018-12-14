@@ -1,10 +1,12 @@
-﻿
+﻿@using DashAccountingSystem.Models
+@model StatementsIndexViewModel
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Statements";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Statements Home</h2>
+<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
 <p>TODO: Show some statements stuff...</p>
 

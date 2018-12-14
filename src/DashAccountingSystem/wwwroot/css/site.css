@@ -28,10 +28,25 @@ body {
     margin: 15px;
 }
 
+/* BEGIN Actually Added Style Rules for all Widths */
+.secondary-nav {
+    margin: 22px auto;
+}
+
+.masthead-tenant-name h4 {
+    margin-top: 23px;
+}
+/*   END Actually Added Style Rules for all Widths */
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */
     .carousel-caption {
         display: none;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .masthead-tenant-name {
+        text-align: right;
     }
 }

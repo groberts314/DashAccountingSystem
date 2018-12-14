@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using DashAccountingSystem.Data.Repositories;
+using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
 {
     public class StatementsController : Controller
     {
+        private readonly ITenantRepository _tenantRepository = null;
+
+        public StatementsController(ITenantRepository tenantRepository)
+        {
+            _tenantRepository = tenantRepository;
+        }
+
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Statements", Name = "statementsIndex")]
-        public IActionResult Index(int tenantId)
+        public async Task<IActionResult> Index(int tenantId)
         {
-            return View();
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+            var viewModel = new StatementsIndexViewModel(tenant);
+
+            return View(viewModel);
         }
 
         [HttpGet]

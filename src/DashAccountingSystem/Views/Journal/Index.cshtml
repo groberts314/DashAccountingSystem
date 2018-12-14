@@ -1,10 +1,12 @@
-﻿
+﻿@using DashAccountingSystem.Models
+@model JournalIndexViewModel
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Journal";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Journal Home</h2>
+<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
 <p>TODO: Show some journal entry stuff...</p>
 

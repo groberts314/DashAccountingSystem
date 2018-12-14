@@ -8,6 +8,7 @@ namespace DashAccountingSystem.Data.Repositories
 {
     public interface ITenantRepository
     {
+        Task<Tenant> GetTenantAsync(int tenantId);
         Task<IEnumerable<Tenant>> GetTenantsAsync();
     }
 }

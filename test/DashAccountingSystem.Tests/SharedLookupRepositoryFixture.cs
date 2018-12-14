@@ -17,7 +17,6 @@ namespace DashAccountingSystem.Tests
             Assert.Contains(accountTypes, at => at.Name == "Equity");
             Assert.Contains(accountTypes, at => at.Name == "Revenue");
             Assert.Contains(accountTypes, at => at.Name == "Expense");
-            Assert.Contains(accountTypes, at => at.Name == "Contra");
         }
 
         [Fact]

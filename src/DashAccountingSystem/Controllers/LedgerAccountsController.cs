@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
+using DashAccountingSystem.Extensions;
+using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
 {
     public class LedgerAccountsController : Controller
     {
         private readonly IAccountRepository _accountRepository = null;
+        private readonly ITenantRepository _tenantRepository = null;
 
-        public LedgerAccountsController(IAccountRepository accountRepository)
+        public LedgerAccountsController(
+            IAccountRepository accountRepository,
+            ITenantRepository tenantRepository)
         {
             _accountRepository = accountRepository;
+            _tenantRepository = tenantRepository;
         }
 
         [HttpGet]
@@ -21,10 +28,15 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> Index(int tenantId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
-
+             
             var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
+            var tenant = accounts.IsEmpty()
+                ? await _tenantRepository.GetTenantAsync(tenantId)
+                : accounts.Select(a => a.Tenant).First();
 
-            return View(accounts);
+            var viewModel = new ChartOfAccountsViewModel(tenant, accounts);
+
+            return View(viewModel);
         }
 
         [HttpGet]

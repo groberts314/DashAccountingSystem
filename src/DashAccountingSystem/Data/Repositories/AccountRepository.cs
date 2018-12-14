@@ -30,6 +30,7 @@ namespace DashAccountingSystem.Data.Repositories
                 .Account
                 .Include(a => a.AccountType)
                 .Include(a => a.AssetType)
+                .Include(a => a.Tenant)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
         }
 
@@ -37,9 +38,10 @@ namespace DashAccountingSystem.Data.Repositories
         {
             return await _db
                 .Account
+                .Where(a => a.TenantId == tenantId)
                 .Include(a => a.AccountType)
                 .Include(a => a.AssetType)
-                .Where(a => a.TenantId == tenantId)
+                .Include(a => a.Tenant)
                 .OrderBy(a => a.AccountTypeId)
                 .ThenBy(a => a.AccountNumber)
                 .ToListAsync();

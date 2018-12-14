@@ -4,23 +4,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystem.Data.Repositories;
+using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
 {
     public class JournalController : Controller
     {
-        public readonly IJournalEntryRepository _journalEntryRepository = null;
+        private readonly IJournalEntryRepository _journalEntryRepository = null;
+        private readonly ITenantRepository _tenantRepository = null; 
 
-        public JournalController(IJournalEntryRepository journalEntryRepository)
+        public JournalController(
+            IJournalEntryRepository journalEntryRepository,
+            ITenantRepository tenantRepository)
         {
             _journalEntryRepository = journalEntryRepository;
+            _tenantRepository = tenantRepository;
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal", Name = "journalIndex")]
-        public IActionResult Index(int tenantId)
+        public async Task<IActionResult> Index(int tenantId)
         {
-            return View();
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+            var viewModel = new JournalIndexViewModel(tenant);
+
+            return View(viewModel);
         }
 
         [HttpGet]
