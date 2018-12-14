@@ -29,12 +29,26 @@ body {
 }
 
 /* BEGIN Actually Added Style Rules for all Widths */
+/* Tenant Sub-Navigation */
 .secondary-nav {
     margin: 22px auto;
 }
 
 .masthead-tenant-name h4 {
     margin-top: 23px;
+}
+
+/* Chart of Accounts */
+.acct-category h3, .acct-category h4, .acct-heading h5 {
+    font-weight: bold;
+}
+.acct-balance {
+    display: flex;
+}
+.acct-balance-value {
+    font-weight: bold;
+    margin-left: 6px;
+    text-align: right;
 }
 /*   END Actually Added Style Rules for all Widths */
 /* Hide/rearrange for smaller screens */

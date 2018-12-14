@@ -29,7 +29,7 @@ namespace DashAccountingSystem.Models
                 NormalBalanceType = account.NormalBalanceType,
                 IsBalanceNormal = account.IsBalanceNormal,
                 BalanceUpdated = account.BalanceUpdated,
-                AssetType = account.AccountType.Name,
+                AssetType = account.AssetType.Name,
                 CurrentBalance = account.CurrentBalance
             };
         }
