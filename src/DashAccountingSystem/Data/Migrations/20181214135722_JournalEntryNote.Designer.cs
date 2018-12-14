@@ -3,15 +3,17 @@ using System;
 using DashAccountingSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DashAccountingSystem.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181214135722_JournalEntryNote")]
+    partial class JournalEntryNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,11 +251,11 @@ namespace DashAccountingSystem.Data.Migrations
                         .HasColumnType("TIMESTAMP")
                         .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
 
-                    b.Property<Guid>("CreatedById");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2048);
+
+                    b.Property<Guid>("EnteredById");
 
                     b.Property<DateTime>("EntryDate");
 
@@ -279,7 +281,7 @@ namespace DashAccountingSystem.Data.Migrations
 
                     b.HasIndex("CanceledById");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("EnteredById");
 
                     b.HasIndex("PostedById");
 
@@ -467,9 +469,9 @@ namespace DashAccountingSystem.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CanceledById");
 
-                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "CreatedBy")
+                    b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "EnteredBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById")
+                        .HasForeignKey("EnteredById")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DashAccountingSystem.Data.Models.ApplicationUser", "PostedBy")
