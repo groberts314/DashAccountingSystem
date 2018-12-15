@@ -1,0 +1,20 @@
+﻿@using DashAccountingSystem.Models
+@{
+    <select class="selectpicker" data-dropup-auto="false" data-width="auto">
+    @{
+        foreach (var category in ViewBag.AccountList.AccountCategories)
+        {
+            <optgroup label="@AccountSubCategoryExtensions.GetDisplayName(category.Key)">
+            @* Can't use Ext. Method normally; runtime binder doesn't like it :-( *@
+
+            @{
+                foreach (var account in category.Value)
+                {
+                    <option value="@account.Id">@account.DisplayName</option>
+                }
+            }
+            </optgroup>
+        }
+    }
+    </select>
+}

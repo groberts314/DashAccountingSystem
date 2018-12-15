@@ -35,7 +35,8 @@ namespace DashAccountingSystem.Controllers
                 ? await _tenantRepository.GetTenantAsync(tenantId)
                 : accounts.Select(a => a.Tenant).First();
 
-            var viewModel = new ChartOfAccountsViewModel(tenant, accounts);
+            ViewBag.Tenant = tenant;
+            var viewModel = new ChartOfAccountsViewModel(accounts);
 
             return View(viewModel);
         }
@@ -59,11 +60,10 @@ namespace DashAccountingSystem.Controllers
             // TODO: If null then 404 not found
             // TODO: If doesn't belong to selected tenant either 404 not found or 403 forbidden
 
-            // TODO: Get pending and recently posted transactions and enhance view model
+            // TODO: Get pending and recently posted transactions and use an enhanced view model
+            //       instead of raw Account model
 
-            var viewModel = new AccountDetailsViewModel(account);
-
-            return View(viewModel);
+            return View(account);
         }
 
         [HttpGet]

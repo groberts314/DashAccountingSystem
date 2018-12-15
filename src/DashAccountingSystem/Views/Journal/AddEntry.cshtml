@@ -1,14 +1,16 @@
 ﻿@using DashAccountingSystem.Models
-@model AddJournalEntryPageViewModel
+@model JournalEntryBaseViewModel
 
 @{
     ViewData["Title"] = "Add Entry";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var tenant = ViewBag.Tenant;
 }
 
-<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
+<partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-<form asp-route="addJournalEntryPost" asp-route-tenantid="@Model.Tenant.Id">
+<form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id">
     <div class="row">
         <div class="col-sm-6 pull-right" style="text-align: right;">
             <input class="btn btn-success" type="submit" value="Submit">
@@ -17,36 +19,36 @@
     <div class="row">
         <div class="col-sm-6 col-md-3">
             <div class="form-group">
-                <label asp-for="JournalEntry.EntryDate">Entry Date</label>
-                <input asp-for="JournalEntry.EntryDate" class="form-control" />
+                <label asp-for="EntryDate">Entry Date</label>
+                <input asp-for="EntryDate" class="form-control" />
             </div>
         </div>
         <div class="col-sm-6 col-md-3">
             <div class="form-group">
-                <label asp-for="JournalEntry.PostDate">Post Date</label>
-                <input asp-for="JournalEntry.PostDate" class="form-control" />
+                <label asp-for="PostDate">Post Date</label>
+                <input asp-for="PostDate" class="form-control" />
             </div>
         </div>
         <div class="col-sm-6 col-md-3">
-            <label asp-for="JournalEntry.CheckNumber">Check # Reference</label>
-            <input asp-for="JournalEntry.CheckNumber" class="form-control" />
+            <label asp-for="CheckNumber">Check # Reference</label>
+            <input asp-for="CheckNumber" class="form-control" />
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
-            <label asp-for="JournalEntry.Description">Transaction Description</label>
-            <textarea asp-for="JournalEntry.Description" class="form-control"></textarea>
+            <label asp-for="Description">Transaction Description</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
         </div>
         <div class="col-md-6">
-            <label asp-for="JournalEntry.Note">Additional Note</label>
-            <textarea asp-for="JournalEntry.Note" class="form-control"></textarea>
+            <label asp-for="Note">Additional Note</label>
+            <textarea asp-for="Note" class="form-control"></textarea>
         </div>
     </div>
 </form>
 
 <div class="row" style="margin-top:22px;">
     <div class="col-md-6">
-        <partial name="~/Views/Shared/_AccountSelector.cshtml" />
+        <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
     </div>
 </div>
 

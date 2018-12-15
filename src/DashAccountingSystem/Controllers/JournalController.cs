@@ -33,9 +33,9 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> Index(int tenantId)
         {
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
-            var viewModel = new JournalIndexViewModel(tenant);
+            ViewBag.Tenant = tenant;
 
-            return View(viewModel);
+            return View();
         }
 
         [HttpGet]
@@ -50,10 +50,13 @@ namespace DashAccountingSystem.Controllers
 
             var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
 
-            var viewModel = new AddJournalEntryPageViewModel(
-                tenant,
-                accounts,
-                assetTypes);
+            ViewBag.AccountList = new CategorizedAccountsViewModel(accounts);
+            ViewBag.AssetTypes = assetTypes;
+            ViewBag.Tenant = tenant;
+
+            var timeZoneId = "America/Los_Angeles"; // TODO: Make this a user preference or something...
+            var localToday = DateTime.UtcNow.WithTimeZone(timeZoneId).Date;
+            var viewModel = new JournalEntryBaseViewModel() { EntryDate = localToday };
 
             return View(viewModel);
         }

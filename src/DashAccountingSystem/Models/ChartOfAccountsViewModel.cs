@@ -5,12 +5,11 @@ using System.Linq;
 
 namespace DashAccountingSystem.Models
 {
-    public class ChartOfAccountsViewModel : BaseTenantViewModel
+    public class ChartOfAccountsViewModel
     {
         public Dictionary<AccountCategory, Dictionary<AccountSubCategory, IEnumerable<AccountLiteViewModel>>> Accounts { get; private set; }
 
-        public ChartOfAccountsViewModel(Tenant tenant, IEnumerable<Account> accounts, string sectionTitle = "Chart of Accounts")
-            : base(tenant, sectionTitle)
+        public ChartOfAccountsViewModel(IEnumerable<Account> accounts)
         {
             if (accounts == null || !accounts.Any())
                 Accounts = InitializeChartOfAccounts(false);

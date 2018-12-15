@@ -4,13 +4,15 @@
 @{
     ViewData["Title"] = "Journal";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var tenant = ViewBag.Tenant;
 }
 
-<partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
+<partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
 <a class="btn btn-primary"
    asp-route="addJournalEntry"
-   asp-route-tenantid="@Model.Tenant.Id"
+   asp-route-tenantid="@tenant.Id"
    role="button"
 >
     Add Entry

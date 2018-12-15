@@ -1,6 +1,5 @@
-﻿@model DashAccountingSystem.Models.BaseTenantViewModel
-
-@{ 
+﻿@{
+    var tenant = ViewBag.Tenant;
     var controller = ViewContext.RouteData.Values["Controller"];
     var isActiveRoute = new string[] { "LedgerAccounts", "Journal", "Statements" }
         .Select(route => new KeyValuePair<string, bool>(route, string.Equals(controller, route)))
@@ -9,10 +8,10 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <h2>@Model.SectionTitle</h2>
+        <h2>@ViewData["Title"]</h2>
     </div>
     <div class="col-sm-6 masthead-tenant-name">
-        <h4>@Model.Tenant.Name</h4>
+        <h4>@tenant.Name</h4>
     </div>
 </div>
 
@@ -20,19 +19,19 @@
     <ul class="nav nav-tabs">
         <li role="presentation" class="@(isActiveRoute["LedgerAccounts"] ? "active" : null)">
             <a asp-route="accountsIndex"
-               asp-route-tenantid="@Model.Tenant.Id">
+               asp-route-tenantid="@tenant.Id">
                 General Ledger
             </a>
         </li>
         <li role="presentation" class="@(isActiveRoute["Journal"] ? "active" : null)">
             <a asp-route="journalIndex"
-               asp-route-tenantid="@Model.Tenant.Id">
+               asp-route-tenantid="@tenant.Id">
                 Journal
             </a>
         </li>
         <li role="presentation" class="@(isActiveRoute["Statements"] ? "active" : null)">
             <a asp-route="statementsIndex"
-               asp-route-tenantid="@Model.Tenant.Id">
+               asp-route-tenantid="@tenant.Id">
                 Statements
             </a>
         </li>

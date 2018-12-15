@@ -22,9 +22,9 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> Index(int tenantId)
         {
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
-            var viewModel = new StatementsIndexViewModel(tenant);
+            ViewBag.Tenant = tenant;
 
-            return View(viewModel);
+            return View();
         }
 
         [HttpGet]
