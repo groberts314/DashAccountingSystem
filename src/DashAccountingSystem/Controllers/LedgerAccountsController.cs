@@ -63,6 +63,8 @@ namespace DashAccountingSystem.Controllers
             // TODO: Get pending and recently posted transactions and use an enhanced view model
             //       instead of raw Account model
 
+            ViewBag.Tenant = account.Tenant;
+
             return View(account);
         }
 

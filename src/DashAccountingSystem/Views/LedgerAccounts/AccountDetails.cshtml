@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Account Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var createdBy = Model.CreatedBy != null ? $"{Model.CreatedBy.FirstName} {Model.CreatedBy.LastName}" : string.Empty;
+    var updatedBy = Model.UpdatedBy != null ? $"{Model.UpdatedBy.FirstName} {Model.UpdatedBy.LastName}" : string.Empty;
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
@@ -68,7 +71,7 @@
             @Html.DisplayNameFor(model => model.CreatedBy)
         </dt>
         <dd>
-            @Html.DisplayFor(model => $"{model.CreatedBy.FirstName} {model.CreatedBy.LastName}")
+            @Html.DisplayFor(model => createdBy)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Updated)
@@ -80,7 +83,7 @@
             @Html.DisplayNameFor(model => model.UpdatedBy)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.UpdatedBy == null ? null : $"{model.UpdatedBy.FirstName} {model.CreatedBy.LastName}")
+            @Html.DisplayFor(model => updatedBy)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.BalanceUpdated)

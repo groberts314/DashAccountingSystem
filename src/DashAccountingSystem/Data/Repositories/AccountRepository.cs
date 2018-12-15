@@ -31,6 +31,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(a => a.AccountType)
                 .Include(a => a.AssetType)
                 .Include(a => a.Tenant)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.UpdatedBy)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
         }
 
