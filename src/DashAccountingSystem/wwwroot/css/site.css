@@ -50,6 +50,27 @@ body {
     margin-left: 6px;
     text-align: right;
 }
+
+/* Asset Selector Glyphicons */
+.filter-option-inner-inner .glyphicon {
+    left: 0px;
+    top: 2px;
+}
+
+.dropdown-menu.inner .glyphicon {
+    left: -8px;
+}
+
+/* Number Input Hacks */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    margin-left: 22px;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 /*   END Actually Added Style Rules for all Widths */
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {

@@ -50,7 +50,10 @@ namespace DashAccountingSystem.Models
         {
             get
             {
-                return Accounts != null && Accounts.Count() >= 2 && IsBalanced;
+                return Accounts != null &&
+                    Accounts.Count() >= 2 &&
+                    Accounts.All(a => a.HasAmount) &&
+                    IsBalanced;
             }
         }
     }

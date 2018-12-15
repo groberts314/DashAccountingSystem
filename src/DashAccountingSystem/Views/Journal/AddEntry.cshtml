@@ -10,10 +10,17 @@
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-<form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id">
+@{ 
+    if (ViewBag.PostBack)
+    {
+        <div>Add Entry Post Back!!!</div>
+    }
+}
+
+<form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id" id="add-entry-form">
     <div class="row">
-        <div class="col-sm-6 pull-right" style="text-align: right;">
-            <input class="btn btn-success" type="submit" value="Submit">
+        <div class="col-sm-4 col-md-2 pull-right" style="text-align: right;">
+            <input class="btn btn-success form-control" type="submit" value="Submit" id="submit-button">
         </div>
     </div>
     <div class="row">
@@ -44,11 +51,144 @@
             <textarea asp-for="Note" class="form-control"></textarea>
         </div>
     </div>
+    <div class="row" style="margin-top:22px; margin-bottom: 22px">
+        <div class="col-md-6">
+            <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
+        </div>
+        <div class="col-md-3">
+            <partial name="~/Views/Shared/_AssetTypeSelectorPartial.cshtml" />
+        </div>
+        <div class="col-md-2 col-md-offset-1" style="text-align:right">
+            <button id="add-account" class="btn btn-success form-control">Add Account</button>
+        </div>
+    </div>
+    <h4>Accounts</h4>
+    <table class="table" id="accounts-table">
+        <thead>
+            <tr>
+                <th>Account</th>
+                <th>Asset Type</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: accounts">
+            <tr>
+                <td>
+                    <input type="hidden" data-bind="name: $root.fieldName('AccountId', $index), value: accountId" />
+                    <span data-bind="text: accountName"></span>
+                </td>
+                <td>
+                    <input type="hidden" data-bind="name: $root.fieldName('AssetTypeId', $index), value: assetTypeId" />
+                    <span data-bind="text: assetTypeName"></span>
+                </td>
+                <td>
+                    <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Debit', $index), value: debit" style="text-align:right" />
+                </td>
+                <td>
+                    <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Credit', $index), value: credit" style="text-align:right" />
+                </td>
+                <td>
+                    <button
+                            class="btn btn-danger form-control remove-account"
+                            data-bind="click: function(data, event) { $root.removeAccount(index, account) }"
+                    >
+                        Remove
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </form>
 
-<div class="row" style="margin-top:22px;">
-    <div class="col-md-6">
-        <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
-    </div>
-</div>
+@section Scripts {
+    <script type="text/javascript">
+        function JournalEntryAccount(accountId, accountName, assetTypeId, assetTypeName) {
+            var self = this;
+            self.accountId = accountId;
+            self.accountName = accountName;
+            self.assetTypeId = assetTypeId;
+            self.assetTypeName = assetTypeName;
+            self.debit = ko.observable(null);
+            self.credit = ko.observable(null);
+        }
+
+        function AccountsViewModel() {
+            var self = this;
+            self.accounts = ko.observableArray([]);
+
+            self.fieldName = function (field, index) {
+                console.log('Field name func');
+                return 'Accounts[' + index + '].' + field;
+            };
+
+            self.removeAccount = function (index, account) {
+                console.log('Remove item at index:', index);
+                console.log('Account details:', account);
+            };
+        }
+
+        (function ($) {
+            console.log('Lodash:', _.VERSION);
+
+            $(document).ready(function () {
+                var $accountSelector = $("#account-selector");
+                var $addAccountBtn = $("#add-account");
+                var $assetSelector = $("#asset-selector");
+                var $form = $('#add-entry-form');
+                var accountsViewModel = new AccountsViewModel();
+
+                $addAccountBtn.on('click', function (e) {
+                    e.preventDefault();
+                    console.log('Add an account!');
+                    var accountId = $accountSelector.val();
+                    var accountName = $accountSelector.find('option:selected').text();
+                    var assetTypeId = $assetSelector.val();
+                    var assetTypeName = $assetSelector.find('option:selected').data('label');
+
+                    console.log('Account ID: ', accountId);
+                    console.log('Account Name:', accountName);
+                    console.log('Asset Type ID: ', assetTypeId);
+                    console.log('Asset Type:', assetTypeName);
+
+                    accountsViewModel.accounts.push(new JournalEntryAccount(accountId, accountName, assetTypeId, assetTypeName));
+                });
+
+                $form.submit(function (e) {
+                    console.log('Submitting the form...');
+
+                    _.forEach(accountsViewModel.accounts(), function (account, index) {
+                        console.log('Account index:', index);
+                        console.log('Account:', account);
+
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', accountsViewModel.fieldName('AccountId', index))
+                            .attr('value', account.accountId)
+                            .appendTo($form);
+
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', accountsViewModel.fieldName('AssetTypeId', index))
+                            .attr('value', account.assetTypeId)
+                            .appendTo($form);
+
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', accountsViewModel.fieldName('Debit', index))
+                            .attr('value', account.debit() || 0)
+                            .appendTo($form);
+
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', accountsViewModel.fieldName('Credit', index))
+                            .attr('value', account.credit() || 0)
+                            .appendTo($form);
+                    });
+
+                    return true;
+                });
+
+                ko.applyBindings(accountsViewModel);
+            });
+        })(jQuery);
+    </script>
+}
 

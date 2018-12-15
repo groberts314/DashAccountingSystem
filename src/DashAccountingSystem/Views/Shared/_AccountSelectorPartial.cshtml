@@ -1,6 +1,6 @@
 ﻿@using DashAccountingSystem.Models
 @{
-    <select class="selectpicker" data-dropup-auto="false" data-width="auto">
+    <select class="selectpicker form-control" data-dropup-auto="false" id="account-selector">
     @{
         foreach (var category in ViewBag.AccountList.AccountCategories)
         {

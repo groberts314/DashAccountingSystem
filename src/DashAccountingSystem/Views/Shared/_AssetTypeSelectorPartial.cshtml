@@ -1,0 +1,20 @@
+﻿@{
+    var assetTypes = ViewBag.AssetTypes;
+
+    <select class="selectpicker form-control" data-dropup-auto="false" data-width="auto" id="asset-selector">
+    @{
+        foreach (var assetType in assetTypes)
+        {
+            var assetTypeAbbreviation = assetType.Name.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0];
+
+            <option
+                    value="@assetType.Id"
+                    data-icon="glyphicon-@assetTypeAbbreviation.ToLower()"
+                    data-label="@assetType.Name"
+            >
+                @assetTypeAbbreviation
+            </option>
+        }
+    }
+    </select>
+}

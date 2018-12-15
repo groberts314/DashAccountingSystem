@@ -53,6 +53,7 @@ namespace DashAccountingSystem.Controllers
             ViewBag.AccountList = new CategorizedAccountsViewModel(accounts);
             ViewBag.AssetTypes = assetTypes;
             ViewBag.Tenant = tenant;
+            ViewBag.PostBack = false;
 
             var timeZoneId = "America/Los_Angeles"; // TODO: Make this a user preference or something...
             var localToday = DateTime.UtcNow.WithTimeZone(timeZoneId).Date;
@@ -65,9 +66,21 @@ namespace DashAccountingSystem.Controllers
         [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntryPost")]
         public async Task<IActionResult> AddEntry(
             [FromRoute] int tenantId,
-            [FromBody] JournalEntryBaseViewModel journalEntry)
+            JournalEntryBaseViewModel journalEntry)
         {
+            // TODO: Fix this hot mess
+            var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
 
+            var tenant = accounts.IsEmpty()
+                ? await _tenantRepository.GetTenantAsync(tenantId)
+                : accounts.Select(a => a.Tenant).First();
+
+            var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
+
+            ViewBag.AccountList = new CategorizedAccountsViewModel(accounts);
+            ViewBag.AssetTypes = assetTypes;
+            ViewBag.Tenant = tenant;
+            ViewBag.PostBack = true;
 
             return View();
         }
