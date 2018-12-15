@@ -1,4 +1,4 @@
-﻿@using NodaTime
+﻿@using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
 @model ChartOfAccountsViewModel
 
@@ -6,119 +6,114 @@
     ViewData["Title"] = Model.Tenant.Name + " - Chart of Accounts";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var timeZoneId = "America/Los_Angeles"; // TODO: Make this a user preference or something...
-    var timeZone = DateTimeZoneProviders.Tzdb[timeZoneId];
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
 <div class="panel-group acct-category" id="acct-cat-accordion">
-    @{
-        int categoryIndex = 0, subCategoryIndex = 0;
-        string categoryKey = null, subCategoryKey = null;
+@{
+    int categoryIndex = 0, subCategoryIndex = 0;
+    string categoryKey = null, subCategoryKey = null;
 
-        foreach (var accountCategoryEntry in Model.Accounts)
-        {
-            categoryKey = accountCategoryEntry.Key.ToString().ToLower();
+    foreach (var accountCategoryEntry in Model.Accounts)
+    {
+        categoryKey = accountCategoryEntry.Key.ToString().ToLower();
 
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#acct-cat-accordion" href="#collapse-@categoryKey">
-                            <span class="parent glyphicon glyphicon-plus"></span>
-                            @accountCategoryEntry.Key.GetDisplayName()
-                        </a>
-                    </h3>
-                </div>
-                <div class="panel-collapse collapse@(categoryIndex == 0 ? " in" : null)" id="collapse-@categoryKey">
-                    <div class="panel-body">
-                        <div class="panel-group acct-sub-category" id="acct-@categoryKey-accordion">
-                        @{
-                            foreach (var accountSubCategoryEntry in accountCategoryEntry.Value)
-                            {
-                                subCategoryKey = accountSubCategoryEntry.Key.ToString().ToLower();
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#acct-cat-accordion" href="#collapse-@categoryKey">
+                        <span class="parent glyphicon glyphicon-plus"></span>
+                        @accountCategoryEntry.Key.GetDisplayName()
+                    </a>
+                </h3>
+            </div>
+            <div class="panel-collapse collapse@(categoryIndex == 0 ? " in" : null)" id="collapse-@categoryKey">
+                <div class="panel-body">
+                    <div class="panel-group acct-sub-category" id="acct-@categoryKey-accordion">
+                    @{
+                        foreach (var accountSubCategoryEntry in accountCategoryEntry.Value)
+                        {
+                            subCategoryKey = accountSubCategoryEntry.Key.ToString().ToLower();
 
-                                <div class="panel panel-info">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#acct-@categoryKey-accordion" href="#collapse-@subCategoryKey">
-                                                <span class="child glyphicon glyphicon-plus"></span>
-                                                @accountSubCategoryEntry.Key.GetDisplayName()
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div class="panel-collapse collapse@(subCategoryIndex == 0 ? " in" : null)" id="collapse-@subCategoryKey">
-                                        <div class="panel-body">
-                                        @{
-                                            if (!accountSubCategoryEntry.Value.Any())
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#acct-@categoryKey-accordion" href="#collapse-@subCategoryKey">
+                                            <span class="child glyphicon glyphicon-plus"></span>
+                                            @accountSubCategoryEntry.Key.GetDisplayName()
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div class="panel-collapse collapse@(subCategoryIndex == 0 ? " in" : null)" id="collapse-@subCategoryKey">
+                                    <div class="panel-body">
+                                    @{
+                                        if (!accountSubCategoryEntry.Value.Any())
+                                        {
+                                            <p>No @accountSubCategoryEntry.Key.GetDisplayName() accounts have been created yet.</p>
+                                        }
+                                        else
+                                        {
+                                            foreach (var account in accountSubCategoryEntry.Value)
                                             {
-                                                <p>No @accountSubCategoryEntry.Key.GetDisplayName() accounts have been created yet.</p>
-                                            }
-                                            else
-                                            {
-                                                foreach (var account in accountSubCategoryEntry.Value)
-                                                {
 
-                                                    var accountBalanceUpdated = LocalDateTime
-                                                        .FromDateTime(account.BalanceUpdated)
-                                                        .InZoneStrictly(DateTimeZone.Utc)
-                                                        .WithZone(timeZone)
-                                                        .ToDateTimeUnspecified();
+                                                var accountBalanceUpdated = account.BalanceUpdated.WithTimeZone(timeZoneId);
 
-                                                    <div class="panel panel-default">
-                                                        <div class="panel-heading acct-heading">
-                                                            <div class="row">
-                                                                <div class="col-md-6">
-                                                                    <h5 class="panel-title">
-                                                                        <a asp-route="accountDetails"
-                                                                            asp-route-tenantid="@Model.Tenant.Id"
-                                                                            asp-route-accountid="@account.Id">
-                                                                            @account.DisplayName
-                                                                        </a>
-                                                                    </h5>
-                                                                </div>
-                                                                <div class="col-md-6 acct-heading-balance">
-                                                                    <div class="acct-balance pull-right">
-                                                                        <div class="acct-balance-asset text-muted small">
-                                                                            @account.AssetType
-                                                                        </div>
-                                                                        <div class="acct-balance-value">
-                                                                            @string.Format("{0:N2}", Math.Abs(account.CurrentBalance))
-                                                                        </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading acct-heading">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h5 class="panel-title">
+                                                                    <a asp-route="accountDetails"
+                                                                        asp-route-tenantid="@Model.Tenant.Id"
+                                                                        asp-route-accountid="@account.Id">
+                                                                        @account.DisplayName
+                                                                    </a>
+                                                                </h5>
+                                                            </div>
+                                                            <div class="col-md-6 acct-heading-balance">
+                                                                <div class="acct-balance pull-right">
+                                                                    <div class="acct-balance-asset text-muted small">
+                                                                        @account.AssetType
+                                                                    </div>
+                                                                    <div class="acct-balance-value">
+                                                                        @string.Format("{0:N2}", Math.Abs(account.CurrentBalance))
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                                
                                                         </div>
-                                                        <div class="panel-body">
-                                                            <div class="small text-muted">Balance updated:</div>
-                                                            <div class="acct-info">
-                                                                @accountBalanceUpdated.ToString("G")
-                                                            </div>
+                                                                
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="small text-muted">Balance updated:</div>
+                                                        <div class="acct-info">
+                                                            @accountBalanceUpdated.ToString("G")
                                                         </div>
                                                     </div>
-                                                }
+                                                </div>
                                             }
                                         }
-                                        </div>
+                                    }
                                     </div>
                                 </div>
+                            </div>
 
-                                ++subCategoryIndex;
-                            }
+                            ++subCategoryIndex;
                         }
-                        </div>
+                    }
                     </div>
                 </div>
             </div>
+        </div>
 
-            subCategoryIndex = 0;
-            ++categoryIndex;
-        }
+        subCategoryIndex = 0;
+        ++categoryIndex;
     }
+}
 </div>
 
 @section Scripts
-    {
+{
     <script type="text/javascript">
         (function ($) {
             $(document).ready(function () {

@@ -8,5 +8,15 @@
 
 <partial name="~/Views/Shared/_TenantMastheadAndSubNav.cshtml" />
 
-<p>TODO: Show some journal entry stuff...</p>
+<a class="btn btn-primary"
+   asp-route="addJournalEntry"
+   asp-route-tenantid="@Model.Tenant.Id"
+   role="button"
+>
+    Add Entry
+</a>
+
+<div style="margin-top:22px">
+    <p>TODO: Show some existing journal entry stuff...</p>
+</div>
 

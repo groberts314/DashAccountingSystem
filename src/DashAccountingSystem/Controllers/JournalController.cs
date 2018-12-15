@@ -4,20 +4,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystem.Data.Repositories;
+using DashAccountingSystem.Extensions;
 using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
 {
     public class JournalController : Controller
     {
+        private readonly IAccountRepository _accountRepository = null;
         private readonly IJournalEntryRepository _journalEntryRepository = null;
+        private readonly ISharedLookupRepository _sharedLookupRepository = null;
         private readonly ITenantRepository _tenantRepository = null; 
 
         public JournalController(
+            IAccountRepository accountRepository,
             IJournalEntryRepository journalEntryRepository,
+            ISharedLookupRepository sharedLookupRepository,
             ITenantRepository tenantRepository)
         {
+            _accountRepository = accountRepository;
             _journalEntryRepository = journalEntryRepository;
+            _sharedLookupRepository = sharedLookupRepository;
             _tenantRepository = tenantRepository;
         }
 
@@ -33,8 +40,32 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntry")]
-        public IActionResult AddEntry(int tenantId)
+        public async Task<IActionResult> AddEntry(int tenantId)
         {
+            var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
+
+            var tenant = accounts.IsEmpty()
+                ? await _tenantRepository.GetTenantAsync(tenantId)
+                : accounts.Select(a => a.Tenant).First();
+
+            var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
+
+            var viewModel = new AddJournalEntryPageViewModel(
+                tenant,
+                accounts,
+                assetTypes);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntryPost")]
+        public async Task<IActionResult> AddEntry(
+            [FromRoute] int tenantId,
+            [FromBody] JournalEntryBaseViewModel journalEntry)
+        {
+
+
             return View();
         }
 

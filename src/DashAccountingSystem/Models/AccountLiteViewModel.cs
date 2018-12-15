@@ -11,7 +11,14 @@ namespace DashAccountingSystem.Models
         public string DisplayName { get; set; }
         public BalanceType NormalBalanceType { get; set; }
         public bool IsBalanceNormal { get; set; }
-        public DateTime BalanceUpdated { get; set; }
+
+        private DateTime _balanceUpdated;
+        public DateTime BalanceUpdated
+        {
+            get { return _balanceUpdated; }
+            set { _balanceUpdated = DateTime.SpecifyKind(value, DateTimeKind.Utc); }
+        }
+
         public string AssetType { get; set; }
         public decimal CurrentBalance { get; set; }
 
