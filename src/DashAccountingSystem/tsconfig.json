@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "lib": [ "dom", "dom.iterable", "es2015", "scripthost" ],
+    "module": "commonjs",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ]
+}

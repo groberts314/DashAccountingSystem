@@ -6,7 +6,10 @@
 # Custom Additions
 *.min.css
 *.min.js
+*.js.map
+src/DashAccountingSystem/wwwroot/js
 src/DashAccountingSystem/wwwroot/lib
+src/DashAccountingSystem/Content/Scripts/**/*.js
 
 # Defaults from Visual Studio template .gitignore
 

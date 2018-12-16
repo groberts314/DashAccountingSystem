@@ -3,7 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>aspnet-DashAccountingSystem-387CA989-B3AA-49F2-8992-A8B9280A74E9</UserSecretsId>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Content\Scripts\src\components\JournalEntryAccounts.tsx" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -21,6 +26,10 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
     <Folder Include="Data\Scripts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="Content\Scripts\src\components\JournalEntryAccounts.tsx" />
   </ItemGroup>
 
 </Project>
