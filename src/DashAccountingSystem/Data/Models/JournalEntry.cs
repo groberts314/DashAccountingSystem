@@ -41,7 +41,7 @@ namespace DashAccountingSystem.Data.Models
 
         public string Note { get; set; }
 
-        public ICollection<JournalEntryAccount> Accounts { get; private set; } = new List<JournalEntryAccount>();
+        public ICollection<JournalEntryAccount> Accounts { get; set; } = new List<JournalEntryAccount>();
 
         public bool IsBalanced
         {

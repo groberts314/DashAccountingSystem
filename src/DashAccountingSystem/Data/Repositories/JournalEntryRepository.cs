@@ -25,6 +25,7 @@ namespace DashAccountingSystem.Data.Repositories
             return await _db
                 .JournalEntry
                 .Where(je => je.Id == journalEntryId)
+                .Include(je => je.Tenant)
                 .Include(je => je.AccountingPeriod)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
@@ -32,6 +33,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.CanceledBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .FirstOrDefaultAsync();
         }
 
@@ -50,6 +53,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -68,6 +73,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -83,6 +90,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -101,6 +110,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -116,6 +127,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -131,6 +144,8 @@ namespace DashAccountingSystem.Data.Repositories
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
                 .ToListAsync();
         }
 
@@ -236,12 +251,12 @@ namespace DashAccountingSystem.Data.Repositories
                 if (account.AmountType == BalanceType.Debit)
                 {
                     account.Account.PendingDebits =
-                        account.Account.PendingDebits ?? 0.0m + account.Amount;
+                        (account.Account.PendingDebits ?? 0.0m) + account.Amount;
                 }
                 else // Credit
                 {
                     account.Account.PendingCredits =
-                        account.Account.PendingCredits ?? 0.0m + account.Amount;
+                        (account.Account.PendingCredits ?? 0.0m) + Math.Abs(account.Amount);
                 }
             }
         }

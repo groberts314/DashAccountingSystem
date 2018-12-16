@@ -2,12 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Models
 {
     public class JournalEntryBaseViewModel
     {
+        public int Id { get; set; }
+
         [DataType(DataType.Date)]
         [Display(Name = "Entry Date")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -20,6 +23,7 @@ namespace DashAccountingSystem.Models
         public DateTime? PostDate { get; set; }
 
         [Display(Name ="Description")]
+        [MaxLength(2048)]
         [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
 
@@ -30,31 +34,47 @@ namespace DashAccountingSystem.Models
         public uint? CheckNumber { get; set; }
 
         [Display(Name = "Accounts")]
-        public IEnumerable<JournalEntryAccountBaseViewModel> Accounts { get; set; } = new List<JournalEntryAccountBaseViewModel>();
+        public virtual IEnumerable<JournalEntryAccountBaseViewModel> Accounts { get; set; } = new List<JournalEntryAccountBaseViewModel>();
 
-        public bool IsBalanced
+        public bool Validate(ModelStateDictionary modelState)
         {
-            get
+            if (Accounts.IsEmpty())
+                modelState.AddModelError("Accounts", "Journal Entry does not have any accounts");
+
+            var invalidAccounts = Accounts.Where(acct => !acct.HasAmount);
+
+            var accountsGroupedByAssetType = Accounts
+                .GroupBy(acct => acct.AssetTypeId)
+                .ToDictionary(grp => grp.Key, grp => grp.Select(a => a));
+
+            var deficientAssetTypeGroups = accountsGroupedByAssetType
+                .Where(assetTypeGroup => assetTypeGroup.Value.Count() < 2);
+
+            if (deficientAssetTypeGroups.Any())
+                foreach (var assetTypeGroup in deficientAssetTypeGroups)
+                {
+                    // TODO: Resolve name of the offending asset type(s)
+                    modelState.AddModelError(
+                        "Accounts",
+                        $"Journal Entry has fewer than two account entries for asset type ID {assetTypeGroup.Key}");
+                }
+
+            var unbalancedAssetTypeGroups = accountsGroupedByAssetType
+                .Where(assetTypeGroup =>
+                    assetTypeGroup.Value.Sum(a => a.Debit) != assetTypeGroup.Value.Sum(a => a.Credit));
+
+            if (unbalancedAssetTypeGroups.Any())
             {
-                if (!Accounts.HasAny())
-                    return true;
-
-                var groupedByAssetType = Accounts
-                    .GroupBy(acct => acct.AssetTypeId);
-
-                return groupedByAssetType.All(grp => grp.Select(acct => acct.Amount).Sum() == 0.0m);
+                foreach (var assetTypeGroup in unbalancedAssetTypeGroups)
+                {
+                    // TODO: Resolve name of the offending asset type(s)
+                    modelState.AddModelError(
+                        "Accounts",
+                        $"Journal Entry accounts do not balance for asset type ID {assetTypeGroup.Key}");
+                }
             }
-        }
 
-        public bool IsValid
-        {
-            get
-            {
-                return Accounts != null &&
-                    Accounts.Count() >= 2 &&
-                    Accounts.All(a => a.HasAmount) &&
-                    IsBalanced;
-            }
+            return modelState.IsValid;
         }
     }
 }

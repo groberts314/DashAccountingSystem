@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using DashAccountingSystem.Data.Models;
-using System.Security.Claims;
+using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Security.Authentication
 {
@@ -27,22 +26,17 @@ namespace DashAccountingSystem.Security.Authentication
 
         public string GetUserFirstName(ClaimsPrincipal user)
         {
-            return user?.FindFirstValue(ClaimTypes.GivenName);
+            return user?.GetUserFirstName();
         }
 
         public string GetUserFullName(ClaimsPrincipal user)
         {
-            if (user == null)
-                return null;
-
-            var firstName = user.FindFirstValue(ClaimTypes.GivenName);
-            var lastName = user.FindFirstValue(ClaimTypes.Surname);
-            return $"{firstName} {lastName}".Trim();
+            return user?.GetUserFullName();
         }
 
         public string GetUserLastName(ClaimsPrincipal user)
         {
-            return user?.FindFirstValue(ClaimTypes.Surname);
+            return user?.GetUserLastName();
         }
     }
 }

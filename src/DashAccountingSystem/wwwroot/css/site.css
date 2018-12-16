@@ -64,7 +64,7 @@ body {
 /* Number Input Hacks */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    margin-left: 22px;
+    margin-left: 11px;
 }
 
 input[type=number] {

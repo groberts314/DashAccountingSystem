@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using DashAccountingSystem.Data.Models;
 
 namespace DashAccountingSystem.Models
@@ -26,7 +22,7 @@ namespace DashAccountingSystem.Models
             get
             {
                 if (AmountType == BalanceType.Credit)
-                    return Credit;
+                    return -Credit;
                 else
                     return Debit;
             }
@@ -44,5 +40,10 @@ namespace DashAccountingSystem.Models
         }
 
         public bool HasAmount { get { return Debit > 0.0m || Credit > 0.0m; } }
+
+        public JournalEntryAccount ToModel()
+        {
+            return new JournalEntryAccount(AccountId, Amount, AssetTypeId);
+        }
     }
 }

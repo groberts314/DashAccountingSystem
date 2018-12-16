@@ -10,97 +10,116 @@
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-@{ 
-    if (ViewBag.PostBack)
+@{
+    if (ViewBag.PostBack && ViewBag.SuccessfulSave)
     {
         <div>Add Entry Post Back!!!</div>
+        @* TODO: Show journal entry details and a succes banner and such *@
+        <div class="row" style="margin-top: 22px">
+            <div class="col-md-2">
+                <a class="btn btn-success"
+                   asp-route="addJournalEntry"
+                   asp-route-tenantid="@tenant.Id"
+                   role="button">
+                    Add Another
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a class="btn btn-primary"
+                   asp-route="journalIndex"
+                   asp-route-tenantid="@tenant.Id"
+                   role="button">
+                    Back to Journal
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id" id="add-entry-form">
+            <div class="row">
+                <div class="col-sm-4 col-md-2 pull-right" style="text-align: right;">
+                    <input class="btn btn-success form-control" type="submit" value="Submit" id="submit-button">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <label asp-for="EntryDate">Entry Date</label>
+                        <input asp-for="EntryDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <label asp-for="PostDate">Post Date</label>
+                        <input asp-for="PostDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <label asp-for="CheckNumber">Check # Reference</label>
+                    <input asp-for="CheckNumber" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Description">Transaction Description</label>
+                    <textarea asp-for="Description" class="form-control" maxlength="2048"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Note">Additional Note</label>
+                    <textarea asp-for="Note" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="row" style="margin-top:22px; margin-bottom: 22px">
+                <div class="col-md-6">
+                    <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
+                </div>
+                <div class="col-md-3">
+                    <partial name="~/Views/Shared/_AssetTypeSelectorPartial.cshtml" />
+                </div>
+                <div class="col-md-2 col-md-offset-1" style="text-align:right">
+                    <button id="add-account" class="btn btn-success form-control">Add Account</button>
+                </div>
+            </div>
+            <h4>Accounts</h4>
+            <table class="table" id="accounts-table">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Asset Type</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: accounts">
+                    <tr>
+                        <td>
+                            <input type="hidden" data-bind="name: $root.fieldName('AccountId', $index), value: accountId" />
+                            <span data-bind="text: accountName"></span>
+                        </td>
+                        <td>
+                            <input type="hidden" data-bind="name: $root.fieldName('AssetTypeId', $index), value: assetTypeId" />
+                            <span data-bind="text: assetTypeName"></span>
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Debit', $index), value: debit" style="text-align:right" />
+                        </td>
+                        <td>
+                            <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Credit', $index), value: credit" style="text-align:right" />
+                        </td>
+                        <td>
+                            <button class="btn btn-danger form-control remove-account"
+                                    data-bind="click: function(data, event) { $root.removeAccount(index, account) }">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
     }
 }
-
-<form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id" id="add-entry-form">
-    <div class="row">
-        <div class="col-sm-4 col-md-2 pull-right" style="text-align: right;">
-            <input class="btn btn-success form-control" type="submit" value="Submit" id="submit-button">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6 col-md-3">
-            <div class="form-group">
-                <label asp-for="EntryDate">Entry Date</label>
-                <input asp-for="EntryDate" class="form-control" />
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="form-group">
-                <label asp-for="PostDate">Post Date</label>
-                <input asp-for="PostDate" class="form-control" />
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <label asp-for="CheckNumber">Check # Reference</label>
-            <input asp-for="CheckNumber" class="form-control" />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <label asp-for="Description">Transaction Description</label>
-            <textarea asp-for="Description" class="form-control"></textarea>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Note">Additional Note</label>
-            <textarea asp-for="Note" class="form-control"></textarea>
-        </div>
-    </div>
-    <div class="row" style="margin-top:22px; margin-bottom: 22px">
-        <div class="col-md-6">
-            <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
-        </div>
-        <div class="col-md-3">
-            <partial name="~/Views/Shared/_AssetTypeSelectorPartial.cshtml" />
-        </div>
-        <div class="col-md-2 col-md-offset-1" style="text-align:right">
-            <button id="add-account" class="btn btn-success form-control">Add Account</button>
-        </div>
-    </div>
-    <h4>Accounts</h4>
-    <table class="table" id="accounts-table">
-        <thead>
-            <tr>
-                <th>Account</th>
-                <th>Asset Type</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody data-bind="foreach: accounts">
-            <tr>
-                <td>
-                    <input type="hidden" data-bind="name: $root.fieldName('AccountId', $index), value: accountId" />
-                    <span data-bind="text: accountName"></span>
-                </td>
-                <td>
-                    <input type="hidden" data-bind="name: $root.fieldName('AssetTypeId', $index), value: assetTypeId" />
-                    <span data-bind="text: assetTypeName"></span>
-                </td>
-                <td>
-                    <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Debit', $index), value: debit" style="text-align:right" />
-                </td>
-                <td>
-                    <input type="number" min="0" step="any" data-bind="name: $root.fieldName('Credit', $index), value: credit" style="text-align:right" />
-                </td>
-                <td>
-                    <button
-                            class="btn btn-danger form-control remove-account"
-                            data-bind="click: function(data, event) { $root.removeAccount(index, account) }"
-                    >
-                        Remove
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</form>
 
 @section Scripts {
     <script type="text/javascript">
