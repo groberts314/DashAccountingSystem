@@ -43,6 +43,8 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     constructor(props: JournalEntryAccountsProps) {
         super(props);
         this.logger = new Logging.Logger('JournalEntryAccounts');
+        this.logger.info('Lodash Version:', _.VERSION);
+
         this.state = {
             accounts: props.accounts || []
         };
