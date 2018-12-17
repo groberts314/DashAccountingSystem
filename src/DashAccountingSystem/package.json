@@ -6,6 +6,7 @@
     "@types/lodash": "^4.14.55",
     "@types/react": "^15.0.16",
     "@types/react-dom": "^0.14.23",
+    "lodash": "^4.17.11",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "structured-log": "0.1.0"

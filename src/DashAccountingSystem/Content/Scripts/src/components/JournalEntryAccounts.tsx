@@ -2,17 +2,8 @@
 import * as Logging from '../common/logging';
 import * as _ from 'lodash';
 import { HtmlInputType } from './formutils';
-
-interface AccountRecord {
-    id: number,
-    name: string
-}
-
-interface AccountCategoryList {
-    category: string,
-    accounts: AccountRecord[]
-}
-
+import { AccountCategoryList, AccountSelector, AccountRecord } from './AccountSelector';
+ 
 interface AssetTypeRecord {
     id: number,
     name: string
@@ -28,13 +19,17 @@ interface JournalEntryAccountRecord {
 }
 
 interface JournalEntryAccountsProps {
-    accountsList: AccountCategoryList,
+    accountsList: AccountCategoryList[],
     assetTypes: AssetTypeRecord[],
     accounts: JournalEntryAccountRecord[]
 }
 
 interface JournalEntryAccountsState {
-    accounts: JournalEntryAccountRecord[]
+    accounts: JournalEntryAccountRecord[],
+    addAccountId?: number,
+    addAccountName?: string,
+    addAssetTypeId?: number,
+    addAssetTypeName?: string
 }
 
 export class JournalEntryAccounts extends React.Component<JournalEntryAccountsProps, JournalEntryAccountsState> {
@@ -49,24 +44,45 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
             accounts: props.accounts || []
         };
 
+        this._onAccountChange = this._onAccountChange.bind(this);
         this._onAddClick = this._onAddClick.bind(this);
     }
 
     render() {
+        const { accountsList, accounts } = this.props;
+        const { accounts: existingAccounts, addAccountId } = this.state;
+
+        const alreadySelectedAccountIds = _.map(existingAccounts, acct => acct.accountId);
+
         return (
             <table className="table" id="accounts-table">
                 <thead>
                     <tr>
-                        <th>Account</th>
-                        <th>Asset Type</th>
-                        <th>Debit</th>
-                        <th>Credit</th>
-                        <th></th>
+                        <th className="col-md-5">Account</th>
+                        <th className="col-md-2">Asset Type</th>
+                        <th className="col-md-2">Debit</th>
+                        <th className="col-md-2">Credit</th>
+                        <th className="col-md-1"></th>
                     </tr>
                 </thead>
                 <tbody>
                 </tbody>
                 <tfoot>
+                    <tr>
+                        <td className="col-md-5">
+                            <AccountSelector
+                                accountList={accountsList}
+                                disabledAccountIds={alreadySelectedAccountIds}
+                                id="account-selector"
+                                onChange={this._onAccountChange}
+                                value={addAccountId}
+                            />
+                        </td>
+                        <td className="col-md-2"></td>
+                        <td className="col-md-2"></td>
+                        <td className="col-md-2"></td>
+                        <td className="col-md-1"></td>
+                    </tr>
                 </tfoot>
             </table>
         );
@@ -74,5 +90,15 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
 
     _onAddClick() {
 
+    }
+
+    _onAccountChange(selectedAccount: AccountRecord) {
+        this.logger.info('Account Changed!  Selected:', selectedAccount);
+
+        if (!_.isNil(selectedAccount)) {
+            this.setState({ addAccountId: selectedAccount.id, addAccountName: selectedAccount.name });
+        } else {
+            this.setState({ addAccountId: null, addAccountName: null });
+        }
     }
 }

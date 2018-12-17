@@ -3,7 +3,7 @@
 @model JournalEntryBaseViewModel
 
 @{
-    ViewData["Title"] = "Add Entry";
+    ViewData["Title"] = "Add Journal Entry";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var tenant = ViewBag.Tenant;
@@ -93,18 +93,7 @@
                     <textarea asp-for="Note" class="form-control"></textarea>
                 </div>
             </div>
-            <div class="row" style="margin-top:22px; margin-bottom: 22px">
-                <div class="col-md-6">
-                    <partial name="~/Views/Shared/_AccountSelectorPartial.cshtml" />
-                </div>
-                <div class="col-md-3">
-                    <partial name="~/Views/Shared/_AssetTypeSelectorPartial.cshtml" />
-                </div>
-                <div class="col-md-2 col-md-offset-1" style="text-align:right">
-                    <button id="add-account" class="btn btn-success form-control">Add Account</button>
-                </div>
-            </div>
-            <h4>Accounts</h4>
+            <h4 style="margin-top: 22px">Journal Entry Account Details</h4>
             <div id="journal-entry-accounts" data-props="@AccountWidgetProps()"></div>
         </form>
     }
@@ -118,7 +107,6 @@
     <script src="~/js/common.js" asp-append-version="true"></script>
     <script src="~/js/components.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        console.log('Components:', components);
         common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
     </script>
 }
