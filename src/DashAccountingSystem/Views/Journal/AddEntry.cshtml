@@ -98,8 +98,7 @@
                     <textarea asp-for="Note" class="form-control"></textarea>
                 </div>
             </div>
-            <h4 style="margin-top: 22px">Journal Entry Account Details</h4>
-            <div id="journal-entry-accounts" data-props="@AccountWidgetProps()"></div>
+            <div id="journal-entry-accounts" data-props="@AccountWidgetProps()" style="margin-top: 22px"></div>
         </form>
     }
 }
@@ -112,13 +111,16 @@
     <script src="~/js/common.js" asp-append-version="true"></script>
     <script src="~/js/components.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
+        // Setup default validation state 
         window.dash = window.dash || {};
         window.dash.journalEntry = {
             error: 'Journal Entry does not have any accounts',
             hasSufficientAccounts: false,
             isBalanced: true
         };
+
+        // Load the journal entry accounts widget
+        common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
     </script>
 }
 

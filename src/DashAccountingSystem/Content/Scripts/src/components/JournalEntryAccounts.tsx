@@ -38,7 +38,8 @@ interface JournalEntryAccountsState {
     addAssetTypeId?: number,
     addAssetTypeName?: string
     addCredit: number,
-    addDebit: number
+    addDebit: number,
+    isEntryUnbalanced: boolean
 }
 
 interface UpdatedAccountValue {
@@ -61,7 +62,8 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
             addAssetTypeId: defaultAssetType.id,
             addAssetTypeName: defaultAssetType.name,
             addCredit: 0,
-            addDebit: 0
+            addDebit: 0,
+            isEntryUnbalanced: false
         };
 
         this._onAccountChange = this._onAccountChange.bind(this);
@@ -75,7 +77,7 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
 
     render() {
         const { accountsList, accounts, assetTypes } = this.props;
-        const { accounts: existingAccounts, addAccountId, addAssetTypeId, addCredit, addDebit } = this.state;
+        const { accounts: existingAccounts, addAccountId, addAssetTypeId, addCredit, addDebit, isEntryUnbalanced } = this.state;
 
         const alreadySelectedAccountIds = _.map(existingAccounts, acct => acct.accountId);
         const canAddNewAccount = !_.isNil(addAccountId) &&
@@ -83,136 +85,151 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
             ((addCredit || 0) > 0 || (addDebit || 0) > 0);
 
         return (
-            <table className="table" id="accounts-table">
-                <thead>
-                    <tr>
-                        <th className="col-md-5">Account</th>
-                        <th className="col-md-1">Asset Type</th>
-                        <th className="col-md-2">Debit</th>
-                        <th className="col-md-2">Credit</th>
-                        <th className="col-md-2"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {_.map(existingAccounts, (account, index) => {
-                        return (
-                            <tr key={account.accountId}>
-                                <td className="col-md-5" style={{ verticalAlign: 'middle', paddingLeft: '20px', paddingTop: '9px' }}>
-                                    <div>
-                                        <input type="hidden" name={`Accounts[${index}].AccountId`} value={account.accountId} />
+            <div>
+                <div className="row" style={{ minHeight: '52px' }}>
+                    <div className="col-md-10">
+                        <h4>Journal Entry Account Details</h4>
+                    </div>
+                    <div className="col-md-2" style={{ textAlign: 'right' }}>
+                        {isEntryUnbalanced ?
+                            (
+                                <div className="alert alert-warning" style={{ paddingTop: '5px', paddingBottom: '5px' }}>
+                                    Entry is not balanced
+                                </div>
+                            ) : null}
+                    </div>
+                </div>
+                <table className="table" id="accounts-table">
+                    <thead>
+                        <tr>
+                            <th className="col-md-5">Account</th>
+                            <th className="col-md-1">Asset Type</th>
+                            <th className="col-md-2">Debit</th>
+                            <th className="col-md-2">Credit</th>
+                            <th className="col-md-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {_.map(existingAccounts, (account, index) => {
+                            return (
+                                <tr key={account.accountId}>
+                                    <td className="col-md-5" style={{ verticalAlign: 'middle', paddingLeft: '20px', paddingTop: '9px' }}>
+                                        <div>
+                                            <input type="hidden" name={`Accounts[${index}].AccountId`} value={account.accountId} />
+                                            <input
+                                                name={`Accounts[${index}].AccountName`}
+                                                readOnly
+                                                style={{ border: 'none', width: '100%' }}
+                                                type="text"
+                                                value={account.accountName}
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="col-md-1">
+                                        <div style={{ textAlign: 'right', paddingRight: '11px', paddingTop: '9px' }}>
+                                            <input type="hidden" name={`Accounts[${index}].AssetTypeId`} value={account.assetTypeId} />
+                                            <input
+                                                name={`Accounts[${index}].AssetType`}
+                                                readOnly
+                                                style={{ border: 'none', textAlign: 'right', width: '100%' }}
+                                                type="text"
+                                                value={account.assetType}
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="col-md-2">
                                         <input
-                                            name={`Accounts[${index}].AccountName`}
-                                            readOnly
-                                            style={{ border: 'none', width: '100%' }}
-                                            type="text"
-                                            value={account.accountName}
+                                            className="form-control"
+                                            min={0}
+                                            name={`Accounts[${index}].Debit`}
+                                            onChange={(e) => this._onEditDebitChange(e, index)}
+                                            step="any"
+                                            type="number"
+                                            style={{ textAlign: 'right' }}
+                                            value={account.debit}
                                         />
-                                    </div>
-                                </td>
-                                <td className="col-md-1">
-                                    <div style={{ textAlign: 'right', paddingRight: '11px', paddingTop: '9px' }}>
-                                        <input type="hidden" name={`Accounts[${index}].AssetTypeId`} value={account.assetTypeId} />
+                                    </td>
+                                    <td className="col-md-2">
                                         <input
-                                            name={`Accounts[${index}].AssetType`}
-                                            readOnly
-                                            style={{ border: 'none', textAlign: 'right', width: '100%' }}
-                                            type="text"
-                                            value={account.assetType}
+                                            className="form-control"
+                                            min={0}
+                                            name={`Accounts[${index}].Credit`}
+                                            onChange={(e) => this._onEditCreditChange(e, index)}
+                                            step="any"
+                                            type="number"
+                                            style={{ textAlign: 'right' }}
+                                            value={account.credit}
                                         />
-                                    </div>
-                                </td>
-                                <td className="col-md-2">
-                                    <input
-                                        className="form-control"
-                                        min={0}
-                                        name={`Accounts[${index}].Debit`}
-                                        onChange={(e) => this._onEditDebitChange(e, index)}
-                                        step="any"
-                                        type="number"
-                                        style={{ textAlign: 'right' }}
-                                        value={account.debit}
-                                    />
-                                </td>
-                                <td className="col-md-2">
-                                    <input
-                                        className="form-control"
-                                        min={0}
-                                        name={`Accounts[${index}].Credit`}
-                                        onChange={(e) => this._onEditCreditChange(e, index)}
-                                        step="any"
-                                        type="number"
-                                        style={{ textAlign: 'right' }}
-                                        value={account.credit}
-                                    />
-                                </td>
-                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={(e) => this._onRemoveAccount(e, account.accountId)}
-                                    >
-                                        {'Remove'}
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td className="col-md-5">
-                            <AccountSelector
-                                accountList={accountsList}
-                                disabledAccountIds={alreadySelectedAccountIds}
-                                id="account-selector"
-                                onChange={this._onAccountChange}
-                                value={addAccountId}
-                            />
-                        </td>
-                        <td className="col-md-1">
-                            <AssetTypeSelector
-                                assetTypes={assetTypes}
-                                id="asset-type-selector"
-                                onChange={this._onAssetTypeChange}
-                                value={addAssetTypeId}
-                            />
-                        </td>
-                        <td className="col-md-2">
-                            <input
-                                className="form-control"
-                                id="add-debit-amount"
-                                min={0}
-                                onChange={this._onAddDebitChange}
-                                step="any"
-                                type="number"
-                                style={{ textAlign: 'right' }}
-                                value={addDebit}
-                            />
-                        </td>
-                        <td className="col-md-2">
-                            <input
-                                className="form-control"
-                                id="add-credit-amount"
-                                min={0}
-                                onChange={this._onAddCreditChange}
-                                step="any"
-                                style={{ textAlign: 'right' }}
-                                type="number"
-                                value={addCredit}
-                             />
-                        </td>
-                        <td className="col-md-2" style={{ textAlign: 'right' }}>
-                            <button
-                                className="btn btn-success"
-                                disabled={!canAddNewAccount}
-                                id="add-account-button"
-                                onClick={this._onAddClick}
-                            >
-                                {'Add'}
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+                                    </td>
+                                    <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={(e) => this._onRemoveAccount(e, account.accountId)}
+                                        >
+                                            {'Remove'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td className="col-md-5">
+                                <AccountSelector
+                                    accountList={accountsList}
+                                    disabledAccountIds={alreadySelectedAccountIds}
+                                    id="account-selector"
+                                    onChange={this._onAccountChange}
+                                    value={addAccountId}
+                                />
+                            </td>
+                            <td className="col-md-1">
+                                <AssetTypeSelector
+                                    assetTypes={assetTypes}
+                                    id="asset-type-selector"
+                                    onChange={this._onAssetTypeChange}
+                                    value={addAssetTypeId}
+                                />
+                            </td>
+                            <td className="col-md-2">
+                                <input
+                                    className="form-control"
+                                    id="add-debit-amount"
+                                    min={0}
+                                    onChange={this._onAddDebitChange}
+                                    step="any"
+                                    type="number"
+                                    style={{ textAlign: 'right' }}
+                                    value={addDebit}
+                                />
+                            </td>
+                            <td className="col-md-2">
+                                <input
+                                    className="form-control"
+                                    id="add-credit-amount"
+                                    min={0}
+                                    onChange={this._onAddCreditChange}
+                                    step="any"
+                                    style={{ textAlign: 'right' }}
+                                    type="number"
+                                    value={addCredit}
+                                 />
+                            </td>
+                            <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                <button
+                                    className="btn btn-success"
+                                    disabled={!canAddNewAccount}
+                                    id="add-account-button"
+                                    onClick={this._onAddClick}
+                                >
+                                    {'Add'}
+                                </button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         );
     }
 
@@ -335,5 +352,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
         });
 
         this.logger.info('Validation State:', dash.journalEntry);
+        this.setState({ isEntryUnbalanced: hasSufficientAccounts && !isEntryBalanced });
     }
 }
