@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Content\Scripts\src\components\AccountSelector.tsx" />
+    <None Remove="Content\Scripts\src\components\AssetTypeSelector.tsx" />
     <None Remove="Content\Scripts\src\components\JournalEntryAccounts.tsx" />
   </ItemGroup>
 
@@ -31,6 +32,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="Content\Scripts\src\components\AccountSelector.tsx" />
+    <TypeScriptCompile Include="Content\Scripts\src\components\AssetTypeSelector.tsx" />
     <TypeScriptCompile Include="Content\Scripts\src\components\JournalEntryAccounts.tsx" />
   </ItemGroup>
 

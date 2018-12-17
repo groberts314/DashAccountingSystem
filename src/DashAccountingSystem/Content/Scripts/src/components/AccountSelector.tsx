@@ -1,5 +1,4 @@
 ﻿import * as React from 'react';
-import * as Logging from '../common/logging';
 import * as _ from 'lodash';
 
 export interface AccountRecord {
@@ -20,12 +19,9 @@ interface AccountSelectorProps {
     value?: number
 }
 
-export class AccountSelector extends React.Component<AccountSelectorProps> {
-    private logger: Logging.ILogger
-
+export class AccountSelector extends React.PureComponent<AccountSelectorProps> {
     constructor(props: AccountSelectorProps) {
         super(props);
-        this.logger = new Logging.Logger('AccountSelector');
         this._onChange = this._onChange.bind(this);
     }
 
@@ -39,7 +35,7 @@ export class AccountSelector extends React.Component<AccountSelectorProps> {
                 id={id}
                 onChange={this._onChange}
                 title="Select an Account"
-                value={value}
+                value={!_.isNil(value) ? value : ''}
             >
                 {_.map(accountList, acctCategoryGroup => {
                     return (

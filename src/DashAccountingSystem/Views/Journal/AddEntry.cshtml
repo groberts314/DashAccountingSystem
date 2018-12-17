@@ -61,6 +61,11 @@
     {
         <form asp-route="addJournalEntryPost" asp-route-tenantid="@tenant.Id" id="add-entry-form">
             <div class="row">
+                <div class="col-md-12">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-sm-4 col-md-2 pull-right" style="text-align: right;">
                     <input class="btn btn-success form-control" type="submit" value="Submit" id="submit-button">
                 </div>
