@@ -113,6 +113,12 @@
     <script src="~/js/components.js" asp-append-version="true"></script>
     <script type="text/javascript">
         common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
+        window.dash = window.dash || {};
+        window.dash.journalEntry = {
+            error: 'Journal Entry does not have any accounts',
+            hasSufficientAccounts: false,
+            isBalanced: true
+        };
     </script>
 }
 

@@ -34,7 +34,7 @@ namespace DashAccountingSystem.Models
         public uint? CheckNumber { get; set; }
 
         [Display(Name = "Accounts")]
-        public virtual IEnumerable<JournalEntryAccountBaseViewModel> Accounts { get; set; } = new List<JournalEntryAccountBaseViewModel>();
+        public virtual IEnumerable<JournalEntryAccountViewModel> Accounts { get; set; } = new List<JournalEntryAccountViewModel>();
 
         public bool Validate(ModelStateDictionary modelState)
         {

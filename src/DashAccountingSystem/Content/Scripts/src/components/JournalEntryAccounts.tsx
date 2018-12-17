@@ -4,19 +4,31 @@ import * as _ from 'lodash';
 import { AccountCategoryList, AccountSelector, AccountRecord } from './AccountSelector';
 import { AssetTypeRecord, AssetTypeSelector } from './AssetTypeSelector';
 
+interface DashNamespace {
+    journalEntry: JournalEntryValidationState
+}
+
+interface JournalEntryValidationState {
+    error: string,
+    hasSufficientAccounts: boolean,
+    isBalanced: boolean
+}
+
+declare var dash: DashNamespace;
+
 interface JournalEntryAccountRecord {
     accountId: number,
     accountName: string,
     assetTypeId: number,
-    assetTypeName: string,
+    assetType: string,
     debit: number,
     credit: number
 }
 
 interface JournalEntryAccountsProps {
+    accounts: JournalEntryAccountRecord[],
     accountsList: AccountCategoryList[],
     assetTypes: AssetTypeRecord[],
-    accounts: JournalEntryAccountRecord[]
 }
 
 interface JournalEntryAccountsState {
@@ -27,6 +39,11 @@ interface JournalEntryAccountsState {
     addAssetTypeName?: string
     addCredit: number,
     addDebit: number
+}
+
+interface UpdatedAccountValue {
+    credit?: number
+    debit?: number
 }
 
 export class JournalEntryAccounts extends React.Component<JournalEntryAccountsProps, JournalEntryAccountsState> {
@@ -83,13 +100,25 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
                                 <td className="col-md-5" style={{ verticalAlign: 'middle', paddingLeft: '20px', paddingTop: '9px' }}>
                                     <div>
                                         <input type="hidden" name={`Accounts[${index}].AccountId`} value={account.accountId} />
-                                        <span>{account.accountName}</span>
+                                        <input
+                                            name={`Accounts[${index}].AccountName`}
+                                            readOnly
+                                            style={{ border: 'none', width: '100%' }}
+                                            type="text"
+                                            value={account.accountName}
+                                        />
                                     </div>
                                 </td>
                                 <td className="col-md-1">
                                     <div style={{ textAlign: 'right', paddingRight: '11px', paddingTop: '9px' }}>
                                         <input type="hidden" name={`Accounts[${index}].AssetTypeId`} value={account.assetTypeId} />
-                                        <span>{account.assetTypeName}</span>
+                                        <input
+                                            name={`Accounts[${index}].AssetType`}
+                                            readOnly
+                                            style={{ border: 'none', textAlign: 'right', width: '100%' }}
+                                            type="text"
+                                            value={account.assetType}
+                                        />
                                     </div>
                                 </td>
                                 <td className="col-md-2">
@@ -119,7 +148,7 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <button
                                         className="btn btn-danger"
-                                        onClick={(e) => this._onRemoveAccount(e, index)}
+                                        onClick={(e) => this._onRemoveAccount(e, account.accountId)}
                                     >
                                         {'Remove'}
                                     </button>
@@ -194,7 +223,7 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
             accountId: addAccountId,
             accountName: addAccountName,
             assetTypeId: addAssetTypeId,
-            assetTypeName: addAssetTypeName,
+            assetType: addAssetTypeName,
             credit: addCredit || 0,
             debit: addDebit || 0
         };
@@ -202,10 +231,16 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
         this.setState({
             accounts: _.concat(accounts, newAccount),
             addAccountId: null,
-            addAssetTypeName: null,
+            addAccountName: null,
             addCredit: 0,
             addDebit: 0
+        }, () => {
+            this._updateValidationState();
         });
+
+        const $accountSelector = $('#account-selector');
+        $accountSelector.val('');
+        $accountSelector.selectpicker('refresh');
     }
 
     _onAddCreditChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -219,8 +254,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     }
 
     _onAccountChange(selectedAccount: AccountRecord) {
-        this.logger.info('Account Changed!  Selected:', selectedAccount);
-
         if (!_.isNil(selectedAccount)) {
             this.setState({ addAccountId: selectedAccount.id, addAccountName: selectedAccount.name });
         } else {
@@ -234,15 +267,73 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     }
 
     _onEditCreditChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-
+        const newCreditValue = parseFloat(event.target.value);
+        const newCreditValueObj = { credit: newCreditValue };
+        this._updateAccountAmount(index, newCreditValueObj);
     }
 
     _onEditDebitChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-
+        const newDebitValue = parseFloat(event.target.value);
+        const newDebitValueObj = { debit: newDebitValue };
+        this._updateAccountAmount(index, newDebitValueObj);
     }
 
-    _onRemoveAccount(event: React.MouseEvent<HTMLElement>, index: number) {
+    _onRemoveAccount(event: React.MouseEvent<HTMLElement>, accountId: number) {
         event.preventDefault();
-        this.logger.info('Remove account at index:', index);
+        this.logger.info('Remove account id:', accountId);
+        const { accounts } = this.state;
+        this.setState({
+            accounts: _.filter(accounts, a => a.accountId !== accountId)
+        }, () => {
+            this._updateValidationState();
+        });
+    }
+
+    _updateAccountAmount(index: number, newAmountValue: UpdatedAccountValue) {
+        const { accounts } = this.state;
+        const affectedAccount = accounts[index];
+        const updatedAccount = _.assign({}, affectedAccount, newAmountValue);
+        const updatedAccountEntry: any = {};
+        updatedAccountEntry[index] = updatedAccount;
+        const updatedAccountsCollection = _.assign([], accounts, updatedAccountEntry);
+        this.setState({ accounts: updatedAccountsCollection }, () => {
+            this._updateValidationState();
+        });
+    }
+
+    _updateValidationState() {
+        this.logger.info('Validating Journal Entry...');
+        const { accounts } = this.state;
+        let errorMessage: string | null = null;
+        let isEntryBalanced: boolean | null = null;
+        const hasSufficientAccounts = accounts.length >= 2;
+
+        if (!hasSufficientAccounts) {
+            errorMessage = accounts.length === 0
+                ? 'Journal Entry does not have any accounts'
+                : 'Journal Entry must have at least two accounts';
+        }
+
+        const groupedByAssetType = _.groupBy(accounts, a => a.assetType);
+        isEntryBalanced = _.every(groupedByAssetType, (grp, assetType) => {
+            this.logger.info('Checking Acccouts for Asset Type', assetType);
+            const debits = _.sumBy(grp, a => a.debit);
+            const credits = _.sumBy(grp, a => a.credit);
+            const isGroupBalanced = debits === credits;
+            this.logger.info('Balanced:', isGroupBalanced);
+
+            if (hasSufficientAccounts && !isGroupBalanced)
+                errorMessage = `Amounts of type ${assetType} do not balance`;
+
+            return isGroupBalanced;
+        });
+
+        dash.journalEntry = _.assign({}, dash.journalEntry, {
+            error: errorMessage || '',
+            isBalanced: isEntryBalanced,
+            hasSufficientAccounts
+        });
+
+        this.logger.info('Validation State:', dash.journalEntry);
     }
 }

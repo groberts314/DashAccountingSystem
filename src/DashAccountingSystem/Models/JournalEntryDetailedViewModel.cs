@@ -26,7 +26,7 @@ namespace DashAccountingSystem.Models
             if (model == null)
                 return null;
 
-            var viewModel = new JournalEntryDetailedViewModel()
+            return new JournalEntryDetailedViewModel()
             {
                 Id = model.Id,
                 EntryId = model.EntryId,
@@ -38,13 +38,9 @@ namespace DashAccountingSystem.Models
                 Note = model.Note,
                 Status = model.Status,
                 Created = model.Created,
-                Updated = model.Updated
+                Updated = model.Updated,
+                Accounts = model.Accounts.Select(JournalEntryAccountViewModel.FromModel)
             };
-
-            viewModel.Accounts = new List<JournalEntryAccountDetailedViewModel>(
-                model.Accounts.Select(JournalEntryAccountDetailedViewModel.FromModel));
-
-            return viewModel;
         }
     }
 }

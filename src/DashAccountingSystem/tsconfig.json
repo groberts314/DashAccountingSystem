@@ -8,7 +8,8 @@
     "noImplicitAny": true,
     "removeComments": false,
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "types": [ "jquery", "bootstrap-select" ]
   },
   "exclude": [
     "node_modules",
