@@ -279,7 +279,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     }
 
     _onAssetTypeChange(selectedAssetType: AssetTypeRecord) {
-        this.logger.info('Asset Type Changed!  Selected:', selectedAssetType);
         this.setState({ addAssetTypeId: selectedAssetType.id, addAssetTypeName: selectedAssetType.name });
     }
 
@@ -297,7 +296,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
 
     _onRemoveAccount(event: React.MouseEvent<HTMLElement>, accountId: number) {
         event.preventDefault();
-        this.logger.info('Remove account id:', accountId);
         const { accounts } = this.state;
         this.setState({
             accounts: _.filter(accounts, a => a.accountId !== accountId)
@@ -319,7 +317,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     }
 
     _updateValidationState() {
-        this.logger.info('Validating Journal Entry...');
         const { accounts } = this.state;
         let errorMessage: string | null = null;
         let isEntryBalanced: boolean | null = null;
@@ -333,11 +330,9 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
 
         const groupedByAssetType = _.groupBy(accounts, a => a.assetType);
         isEntryBalanced = _.every(groupedByAssetType, (grp, assetType) => {
-            this.logger.info('Checking Acccouts for Asset Type', assetType);
             const debits = _.sumBy(grp, a => a.debit);
             const credits = _.sumBy(grp, a => a.credit);
             const isGroupBalanced = debits === credits;
-            this.logger.info('Balanced:', isGroupBalanced);
 
             if (hasSufficientAccounts && !isGroupBalanced)
                 errorMessage = `Amounts of type ${assetType} do not balance`;
@@ -351,7 +346,6 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
             hasSufficientAccounts
         });
 
-        this.logger.info('Validation State:', dash.journalEntry);
         this.setState({ isEntryUnbalanced: hasSufficientAccounts && !isEntryBalanced });
     }
 }

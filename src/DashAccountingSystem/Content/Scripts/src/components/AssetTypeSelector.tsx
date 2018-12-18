@@ -25,7 +25,6 @@ export class AssetTypeSelector extends React.PureComponent<AssetTypeSelectorProp
         return (
             <select
                 className="selectpicker form-control"
-                data-dropup-auto="false"
                 data-width="auto"
                 id={id}
                 onChange={this._onChange}

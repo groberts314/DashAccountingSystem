@@ -31,7 +31,7 @@ export class AccountSelector extends React.PureComponent<AccountSelectorProps> {
         return (
             <select
                 className="selectpicker form-control"
-                data-dropup-auto="false"
+                data-size="10"
                 id={id}
                 onChange={this._onChange}
                 title="Select an Account"

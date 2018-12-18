@@ -44,7 +44,7 @@ namespace DashAccountingSystem.Models
             var invalidAccounts = Accounts.Where(acct => !acct.HasAmount);
 
             var accountsGroupedByAssetType = Accounts
-                .GroupBy(acct => acct.AssetTypeId)
+                .GroupBy(acct => new { acct.AssetTypeId, acct.AssetType })
                 .ToDictionary(grp => grp.Key, grp => grp.Select(a => a));
 
             var deficientAssetTypeGroups = accountsGroupedByAssetType
@@ -53,10 +53,9 @@ namespace DashAccountingSystem.Models
             if (deficientAssetTypeGroups.Any())
                 foreach (var assetTypeGroup in deficientAssetTypeGroups)
                 {
-                    // TODO: Resolve name of the offending asset type(s)
                     modelState.AddModelError(
                         "Accounts",
-                        $"Journal Entry has fewer than two account entries for asset type ID {assetTypeGroup.Key}");
+                        $"Journal Entry has fewer than two account entries of type {assetTypeGroup.Key.AssetType}");
                 }
 
             var unbalancedAssetTypeGroups = accountsGroupedByAssetType
@@ -67,10 +66,9 @@ namespace DashAccountingSystem.Models
             {
                 foreach (var assetTypeGroup in unbalancedAssetTypeGroups)
                 {
-                    // TODO: Resolve name of the offending asset type(s)
                     modelState.AddModelError(
                         "Accounts",
-                        $"Journal Entry accounts do not balance for asset type ID {assetTypeGroup.Key}");
+                        $"Journal Entry accounts do not balance of type {assetTypeGroup.Key.AssetType}");
                 }
             }
 

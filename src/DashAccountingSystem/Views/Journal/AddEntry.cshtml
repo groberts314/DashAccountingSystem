@@ -21,7 +21,8 @@
             })
         });
 
-        var combinedProps = new {
+        var combinedProps = new
+        {
             accounts = Model.Accounts,
             accountsList = transformedAccountsList,
             assetTypes = ViewBag.AssetTypes
@@ -75,27 +76,37 @@
                     <div class="form-group">
                         <label asp-for="EntryDate">Entry Date</label>
                         <input asp-for="EntryDate" class="form-control" />
+                        <span asp-validation-for="EntryDate" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-3">
                     <div class="form-group">
                         <label asp-for="PostDate">Post Date</label>
                         <input asp-for="PostDate" class="form-control" />
+                        <span asp-validation-for="PostDate" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-3">
-                    <label asp-for="CheckNumber">Check # Reference</label>
-                    <input asp-for="CheckNumber" class="form-control" />
+                    <div class="form-group">
+                        <label asp-for="CheckNumber">Check # Reference</label>
+                        <input asp-for="CheckNumber" class="form-control" />
+                        <span asp-validation-for="CheckNumber" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <label asp-for="Description">Transaction Description</label>
-                    <textarea asp-for="Description" class="form-control" maxlength="2048"></textarea>
+                    <div class="form-group">
+                        <label asp-for="Description">Transaction Description</label>
+                        <textarea asp-for="Description" class="form-control" maxlength="2048"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Note">Additional Note</label>
-                    <textarea asp-for="Note" class="form-control"></textarea>
+                    <div class="form-group">
+                        <label asp-for="Note">Additional Note</label>
+                        <textarea asp-for="Note" class="form-control"></textarea>
+                    </div>
                 </div>
             </div>
             <div id="journal-entry-accounts" data-props="@AccountWidgetProps()" style="margin-top: 22px"></div>
@@ -104,6 +115,7 @@
 }
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     @*<script src="~/js/react.min.js"></script>*@
     @*<script src="~/js/react-dom.min.js"></script>*@
     <script src="~/js/react.js"></script>
@@ -111,7 +123,10 @@
     <script src="~/js/common.js" asp-append-version="true"></script>
     <script src="~/js/components.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        // Setup default validation state 
+        // Load the journal entry accounts widget
+        common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
+
+        // Setup default validation state (done this way to share with the React widget)
         window.dash = window.dash || {};
         window.dash.journalEntry = {
             error: 'Journal Entry does not have any accounts',
@@ -119,8 +134,39 @@
             isBalanced: true
         };
 
-        // Load the journal entry accounts widget
-        common.mountComponent(components.JournalEntryAccounts, "#journal-entry-accounts");
+        // Validate journal entry accounts before submitting
+        (function ($) {
+            $(document).ready(function () {
+                var $validationSummaryList = $('.validation-summary-valid ul');
+                var $form = $('#add-entry-form');
+                var formValidator = $form.data('validator');
+                var settings = formValidator.settings;
+
+                settings.submitHandler = function (form) {
+                    // Once top-level validation has past but before we submit the form, check the accounts validation state
+                    var validationState = window.dash.journalEntry;
+
+                    if (!validationState.hasSufficientAccounts ||
+                        !validationState.isBalanced) {
+                        $validationSummaryList
+                            .empty()
+                            .append('<li>' + validationState.error + '</li>');
+                        return;
+                    }
+
+                    form.submit();
+                };
+
+                settings.highlight = function (element) {
+                    console.log('Highlighting...');
+                    $(element).closest('.form-group').addClass('has-error');
+                };
+
+                settings.unhighlight = function (element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                };
+            });
+        }(jQuery));
     </script>
 }
 
