@@ -283,13 +283,22 @@ export class JournalEntryAccounts extends React.Component<JournalEntryAccountsPr
     }
 
     _onEditCreditChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-        const newCreditValue = parseFloat(event.target.value);
+        let newCreditValue = parseFloat(event.target.value);
+
+        if (_.isNaN(newCreditValue))
+            newCreditValue = 0;
+
         const newCreditValueObj = { credit: newCreditValue };
         this._updateAccountAmount(index, newCreditValueObj);
     }
 
     _onEditDebitChange(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-        const newDebitValue = parseFloat(event.target.value);
+        let newDebitValue = parseFloat(event.target.value);
+
+        if (_.isNaN(newDebitValue)) {
+            newDebitValue = 0;
+        }
+
         const newDebitValueObj = { debit: newDebitValue };
         this._updateAccountAmount(index, newDebitValueObj);
     }
