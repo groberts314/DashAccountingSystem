@@ -33,6 +33,8 @@ namespace DashAccountingSystem.Controllers
         [Route("Ledger/{tenantId:int}/Journal", Name = "journalIndex")]
         public async Task<IActionResult> Index(int tenantId)
         {
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
             ViewBag.Tenant = tenant;
 
@@ -43,7 +45,9 @@ namespace DashAccountingSystem.Controllers
         [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntry")]
         public async Task<IActionResult> AddEntry(int tenantId)
         {
-            await HydrateJournalEntryWriteViewBag(tenantId);
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+
+            await HydrateViewBagLookupValues(tenantId, true);
 
             ViewBag.PostBack = false;
             ViewBag.SuccessfulSave = false;
@@ -61,6 +65,8 @@ namespace DashAccountingSystem.Controllers
             [FromRoute] int tenantId,
             JournalEntryBaseViewModel journalEntryViewModel)
         {
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+
             ViewBag.PostBack = true;
             ViewBag.SuccessfulSave = false;
 
@@ -76,7 +82,7 @@ namespace DashAccountingSystem.Controllers
 
             if (!isJournalEntryValid)
             {
-                await HydrateJournalEntryWriteViewBag(tenantId);
+                await HydrateViewBagLookupValues(tenantId, true);
                 return View(journalEntryViewModel);
             }
 
@@ -111,45 +117,86 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}", Name = "journalEntryDetails")]
-        public IActionResult EntryDetails(int tenantId, int entryId)
+        public async Task<IActionResult> EntryDetails(int tenantId, int entryId)
         {
-            return View();
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+            return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Edit", Name = "editJournalEntry")]
-        public IActionResult EditEntry(int tenantId, int entryId)
+        public async Task<IActionResult> EditEntry(int tenantId, int entryId)
         {
+            var journalEntry = await _journalEntryRepository.GetDetailedByTenantAndEntryIdAsync(tenantId, entryId);
+
+            // If null then 404 not found
+            if (journalEntry == null)
+                return NotFound();
+
+            var viewModel = JournalEntryDetailedViewModel.FromModel(journalEntry);
+
+            ViewBag.Tenant = journalEntry.Tenant;
+            await HydrateViewBagLookupValues(tenantId, false);
+
             return View();
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Post", Name = "postJournalEntry")]
-        public IActionResult PostEntry(int tenantId, int entryId)
+        public async Task<IActionResult> PostEntry(int tenantId, int entryId)
         {
-            return View();
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+            return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
         }
 
         [HttpGet]
-        [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Delete", Name = "deleteJournalEntry")]
-        public IActionResult DeleteEntry(int tenantId, int entryId)
+        [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Cancel", Name = "cancelPendingJournalEntry")]
+        public async Task<IActionResult> CancelPendingEntry(int tenantId, int entryId)
         {
-            return View();
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+            return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
         }
 
-        private async Task HydrateJournalEntryWriteViewBag(int tenantId)
+        private async Task<IActionResult> HandleJournalEntryDetailsReadRequest(int tenantId, int entryId)
+        {
+            var journalEntry = await _journalEntryRepository.GetDetailedByTenantAndEntryIdAsync(tenantId, entryId);
+
+            // If null then 404 not found
+            if (journalEntry == null)
+                return NotFound();
+
+            var viewModel = JournalEntryDetailedViewModel.FromModel(journalEntry);
+
+            ViewBag.Tenant = journalEntry.Tenant;
+
+            return View(viewModel);
+        }
+
+        private async Task HydrateViewBagLookupValues(int tenantId, bool hydrateTenant)
         {
             var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
-
-            var tenant = accounts.IsEmpty()
-                ? await _tenantRepository.GetTenantAsync(tenantId)
-                : accounts.Select(a => a.Tenant).First();
-
             var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
 
             ViewBag.AccountList = new CategorizedAccountsViewModel(accounts);
             ViewBag.AssetTypes = assetTypes;
-            ViewBag.Tenant = tenant;
+
+            if (hydrateTenant)
+            {
+                var tenant = accounts.HasAny() ? accounts.Select(a => a.Tenant).First() : null;
+                await HydrateViewTagTenant(tenantId, tenant);
+            }
+        }
+
+        private async Task HydrateViewTagTenant(int tenantId, Tenant tenant)
+        {
+            if (tenant != null)
+            {
+                ViewBag.Tenant = tenant;
+                return;
+            }
+
+            var fetchedTenant = await _tenantRepository.GetTenantAsync(tenantId);
+            ViewBag.Tenant = fetchedTenant;
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿@using DashAccountingSystem.Data.Models
+@model TransactionStatus
+@{
+    string statusLabelClass = "alert";
+
+    switch (Model)
+    {
+        case TransactionStatus.Pending:
+            statusLabelClass = $"{statusLabelClass} alert-warning";
+            break;
+        case TransactionStatus.Posted:
+            statusLabelClass = $"{statusLabelClass} alert-success";
+            break;
+        case TransactionStatus.Canceled:
+            statusLabelClass = $"{statusLabelClass} alert-danger";
+            break;
+        case TransactionStatus.Closed:
+            statusLabelClass = $"{statusLabelClass} alert-info";
+            break;
+    }
+
+    <div class="@statusLabelClass" style="display: inline; padding: 5px 15px">@Model</div>
+}

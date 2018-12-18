@@ -5,6 +5,7 @@
         Unknown = 0,
         Pending = 1,
         Posted = 2,
-        Canceled = 3
+        Canceled = 3,
+        Closed = 4
     }
 }

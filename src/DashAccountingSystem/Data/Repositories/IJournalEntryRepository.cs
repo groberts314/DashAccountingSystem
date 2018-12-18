@@ -10,6 +10,9 @@ namespace DashAccountingSystem.Data.Repositories
         Task<JournalEntry> CreateJournalEntryAsync(JournalEntry entry);
 
         Task<JournalEntry> GetByIdAsync(int journalEntryId);
+        Task<JournalEntry> GetByTenantAndEntryIdAsync(int tenantId, int entryId);
+        Task<JournalEntry> GetDetailedByIdAsync(int journalEntryId);
+        Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(int tenantId, int entryId);
 
         Task<IEnumerable<JournalEntry>> GetJournalEntriesAsync(int tenantId, int pageNumber, int pageSize);
         Task<IEnumerable<JournalEntry>> GetJournalEntriesForMonthAsync(int tenantId, int year, byte month);

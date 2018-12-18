@@ -45,44 +45,12 @@
             ? $"Journal Entry #{detailedModel.EntryId} successfully saved and posted"
             : $"Journal Entry #{detailedModel.EntryId} successfully saved";
 
-        var statusLabelClass = detailedModel.Status == TransactionStatus.Posted
-            ? "alert alert-success"
-            : "alert alert-warning"; // Pending
-
         <div class="alert alert-success" role="alert">
             <strong>@successHeadline</strong>
         </div>
-        <div class="list-group" style="margin: auto 15px">
-            <div class="list-group-item row">
-                <div class="col-md-2">Entry Date</div>
-                <div class="col-md-10">@detailedModel.EntryDate.ToString("d")</div>
-            </div>
-            <div class="list-group-item row">
-                <div class="col-md-2">Status</div>
-                <div class="col-md-10">
-                    <div class="@statusLabelClass" style="display: inline; padding: 5px 15px">
-                        @detailedModel.Status
-                    </div>
-                </div>
-            </div>
-            @if (isPosted)
-            {
-                <div class="list-group-item row">
-                    <div class="col-md-2">Post Date</div>
-                    <div class="col-md-10">@detailedModel.PostDate.Value.ToString("d")</div>
-                </div>
-            }
-            <div class="list-group-item row">
-                <div class="col-md-2">Description</div>
-                <div class="col-md-10">@detailedModel.Description</div>
-            </div>
-            <div class="list-group-item row">
-                <div class="col-md-2">Check #</div>
-                <div class="col-md-10">@(detailedModel.CheckNumber?.ToString() ?? "N/A")</div>
-            </div>
-        </div>
+        <partial name="_JournalEntryMetadataPartial" for="@detailedModel" />
         @* TODO: Replace buttons below with links that make sense *@
-        @*       * Add Another and Back to Journal are always present, as well as a View Details   *@
+        @*       * Add Another and Back to Journal are always present, as well as a View Details *@
         @*       * Pending Entries also have Edit and Cancel *@
         <div class="row" style="margin-top: 22px">
             <div class="col-md-2">

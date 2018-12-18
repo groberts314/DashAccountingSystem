@@ -26,6 +26,24 @@ namespace DashAccountingSystem.Data.Repositories
                 .JournalEntry
                 .Where(je => je.Id == journalEntryId)
                 .Include(je => je.Tenant)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<JournalEntry> GetByTenantAndEntryIdAsync(int tenantId, int entryId)
+        {
+            return await _db
+                .JournalEntry
+                .Where(je => je.TenantId == tenantId && je.EntryId == entryId)
+                .Include(je => je.Tenant)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<JournalEntry> GetDetailedByIdAsync(int journalEntryId)
+        {
+            return await _db
+                .JournalEntry
+                .Where(je => je.Id == journalEntryId)
+                .Include(je => je.Tenant)
                 .Include(je => je.AccountingPeriod)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
@@ -35,7 +53,25 @@ namespace DashAccountingSystem.Data.Repositories
                     .ThenInclude(jeAcct => jeAcct.Account)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.AssetType)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(int tenantId, int entryId)
+        {
+            return await _db
+                .JournalEntry
+                .Where(je => je.TenantId == tenantId && je.EntryId == entryId)
+                .Include(je => je.Tenant)
+                .Include(je => je.AccountingPeriod)
+                .Include(je => je.CreatedBy)
+                .Include(je => je.UpdatedBy)
+                .Include(je => je.PostedBy)
+                .Include(je => je.CanceledBy)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<IEnumerable<JournalEntry>> GetJournalEntriesAsync(int tenantId, int pageNumber, int pageSize)
@@ -190,7 +226,7 @@ namespace DashAccountingSystem.Data.Repositories
 
                 await _db.JournalEntry.AddAsync(entry);
                 await _db.SaveChangesAsync();
-                var persistedEntry = await GetByIdAsync(entry.Id);
+                var persistedEntry = await GetDetailedByIdAsync(entry.Id);
 
                 if (entry.Status == TransactionStatus.Posted)
                     UpdateAccountsForPostedJournalEntry(persistedEntry);
@@ -201,12 +237,12 @@ namespace DashAccountingSystem.Data.Repositories
                 transaction.Commit();
             }
 
-            return await GetByIdAsync(entry.Id);
+            return await GetDetailedByIdAsync(entry.Id);
         }
 
         public async Task<JournalEntry> PostJournalEntryAsync(int entryId, DateTime postDate, Guid postedByUserId)
         {
-            var entry = await GetByIdAsync(entryId);
+            var entry = await GetDetailedByIdAsync(entryId);
 
             if (entry == null)
                 return null;
@@ -228,7 +264,7 @@ namespace DashAccountingSystem.Data.Repositories
 
             await _db.SaveChangesAsync();
 
-            return await GetByIdAsync(entryId);
+            return await GetDetailedByIdAsync(entryId);
         }
 
         private void UpdateAccountsForPostedJournalEntry(JournalEntry entry)
