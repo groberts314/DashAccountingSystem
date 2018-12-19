@@ -241,7 +241,7 @@ namespace DashAccountingSystem.Data.Repositories
             return await GetDetailedByIdAsync(entry.Id);
         }
 
-        public async Task<JournalEntry> PostJournalEntryAsync(int entryId, DateTime postDate, Guid postedByUserId)
+        public async Task<JournalEntry> PostJournalEntryAsync(int entryId, DateTime postDate, Guid postedByUserId, string note = null)
         {
             var entry = await GetDetailedByIdAsync(entryId);
 
@@ -251,6 +251,13 @@ namespace DashAccountingSystem.Data.Repositories
             entry.PostDate = postDate;
             entry.PostedById = postedByUserId;
             entry.Status = TransactionStatus.Posted;
+
+            if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
+            {
+                entry.Note = note;
+                entry.Updated = DateTime.UtcNow;
+                entry.UpdatedById = postedByUserId;
+            }
 
             if (!entry.AccountingPeriod.ContainsDate(postDate))
             {

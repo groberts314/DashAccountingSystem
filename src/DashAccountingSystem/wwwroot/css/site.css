@@ -71,6 +71,16 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
+/* Read-Only Form Input Styled to look like static test */
+input[readonly].form-control, input[readonly].form-control-static {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    font-size: 1em;
+    min-height: 0;
+    padding: 0;
+}
+
 /*   END Actually Added Style Rules for all Widths */
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {

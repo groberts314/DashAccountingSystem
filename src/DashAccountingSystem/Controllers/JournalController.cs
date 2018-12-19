@@ -151,7 +151,52 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> PostEntry(int tenantId, int entryId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
+
+            ViewBag.PostBack = false;
+            ViewBag.SuccessfulSave = false;
+
             return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
+        }
+
+        [HttpPost]
+        [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Post", Name = "postJournalEntryPost")]
+        public async Task<IActionResult> PostEntry(
+            int tenantId,
+            int entryId,
+            JournalEntryBaseViewModel journalEntryViewModel)
+        {
+            ViewBag.PostBack = true;
+            ViewBag.SuccessfulSave = false;
+
+            var isJournalEntryValid = ModelState.IsValid;
+
+            if (isJournalEntryValid)
+            {
+                // Validate that it has a Post Date ... not normally required for this view model, but required for Posting!
+                if (!journalEntryViewModel.PostDate.HasValue)
+                {
+                    ModelState.AddModelError("PostDate", "Post date is required to post the journal entry");
+                }
+            }
+
+            if (!isJournalEntryValid)
+            {
+                return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
+            }
+
+            var contextUserId = User.GetUserId();
+            var postedEntry = await _journalEntryRepository.PostJournalEntryAsync(
+                journalEntryViewModel.Id,
+                journalEntryViewModel.PostDate.Value,
+                contextUserId,
+                journalEntryViewModel.Note);
+
+            var postedJournalEntryViewModel = JournalEntryDetailedViewModel.FromModel(postedEntry);
+
+            ViewBag.Tenant = postedEntry.Tenant;
+            ViewBag.SuccessfulSave = true;
+
+            return View(postedJournalEntryViewModel);
         }
 
         [HttpGet]
@@ -188,11 +233,17 @@ namespace DashAccountingSystem.Controllers
             if (hydrateTenant)
             {
                 var tenant = accounts.HasAny() ? accounts.Select(a => a.Tenant).First() : null;
-                await HydrateViewTagTenant(tenantId, tenant);
+                await HydrateViewTenant(tenantId, tenant);
             }
         }
 
-        private async Task HydrateViewTagTenant(int tenantId, Tenant tenant)
+        private async Task HydrateViewBagTenant(int tenantId)
+        {
+            var fetchedTenant = await _tenantRepository.GetTenantAsync(tenantId);
+            ViewBag.Tenant = fetchedTenant;
+        }
+
+        private async Task HydrateViewTenant(int tenantId, Tenant tenant)
         {
             if (tenant != null)
             {
@@ -200,8 +251,7 @@ namespace DashAccountingSystem.Controllers
                 return;
             }
 
-            var fetchedTenant = await _tenantRepository.GetTenantAsync(tenantId);
-            ViewBag.Tenant = fetchedTenant;
+            await HydrateViewBagTenant(tenantId);
         }
     }
 }

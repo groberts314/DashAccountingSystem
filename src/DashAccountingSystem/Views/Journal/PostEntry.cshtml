@@ -1,10 +1,124 @@
-﻿
+﻿@using DashAccountingSystem.Models
+@model JournalEntryDetailedViewModel
 @{
-    ViewData["Title"] = "AddEntry";
+    ViewData["Title"] = "Post Journal Entry";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var tenant = ViewBag.Tenant;
 }
 
-<h2>Post Journal Entry</h2>
+<partial name="_TenantMastheadAndNavPartial" />
 
-<p>TODO: Show some journal entry stuff...</p>
+@{
+    if (ViewBag.PostBack && ViewBag.SuccessfulSave)
+    {
+        <div class="alert alert-success" role="alert">
+            <strong>@($"Journal Entry for Transaction ID # {Model.EntryId} successfully posted")</strong>
+        </div>
+        <div style="margin: 22px auto">
+            <a class="btn btn-success"
+               asp-route="addJournalEntry"
+               asp-route-tenantid="@tenant.Id"
+               role="button"
+               style="margin-right: 22px">
+                Add Another Entry
+            </a>
+            <a class="btn btn-primary"
+               asp-route="journalIndex"
+               asp-route-tenantid="@tenant.Id"
+               role="button">
+                Back to Journal
+            </a>
+        </div>
+    }
+    else
+    {
+        <form asp-route="postJournalEntryPost" asp-route-tenantid="@tenant.Id" id="post-entry-form">
+            <div class="row">
+                <div class="col-md-12">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 col-md-2 pull-right" style="text-align: right;">
+                    <input class="btn btn-success form-control" type="submit" value="Submit" id="submit-button">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <label asp-for="PostDate">Post Date</label>
+                        <input asp-for="PostDate" class="form-control" data-val="true" data-val-required="Post Date is required" />
+                        <span asp-validation-for="PostDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Note">Additional Note</label>
+                        <textarea asp-for="Note" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-group" style="margin: auto 15px; width: 67%">
+                <div class="list-group-item row">
+                    <div class="col-md-2"><strong>Transaction #</strong></div>
+                    <div class="col-md-4">
+                        <input asp-for="EntryId" readonly class="form-control-static" />
+                    </div>
+                    <div class="col-md-2"><strong>Entry Date</strong></div>
+                    <div class="col-md-4">
+                        <input asp-for="EntryDate" readonly class="form-control-static" />
+                    </div>
+                </div>
+                <div class="list-group-item row">
+                    <div class="col-md-2"><strong>Status</strong></div>
+                    <div class="col-md-4">
+                        <partial name="_TransactionStatusPartial" for="@Model.Status" />
+                    </div>
+                    <div class="col-md-2"><strong>Check #</strong></div>
+                    <div class="col-md-4">
+                        <input asp-for="CheckNumber" readonly class="form-control-static" />
+                    </div>
+                </div>
+                <div class="list-group-item row">
+                    <div class="col-md-2"><strong>Description</strong></div>
+                    <div class="col-md-10">
+                        <input asp-for="Description" readonly class="form-control-static" />
+                    </div>
+                </div>
+            </div>
+            <input asp-for="Id" type="hidden" />
+        </form>
+        <partial name="_JournalEntryAccountsPartial" />
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+        // Validate journal entry accounts before submitting
+        (function ($) {
+            $(document).ready(function () {
+                var $validationSummaryList = $('.validation-summary-valid ul');
+                var $form = $('#add-entry-form');
+                var formValidator = $form.data('validator');
+
+                if (formValidator) {
+                    var settings = formValidator.settings;
+
+                    settings.highlight = function (element) {
+                        console.log('Highlighting...');
+                        $(element).closest('.form-group').addClass('has-error');
+                    };
+
+                    settings.unhighlight = function (element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                    };
+                }
+            });
+        }(jQuery));
+    </script>
+}
 

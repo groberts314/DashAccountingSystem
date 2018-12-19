@@ -64,7 +64,7 @@ namespace DashAccountingSystem.Data.Models
 
         public DateTime? Updated { get; set; }
 
-        public Guid? UpdatedById { get; private set; }
+        public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; private set; }
 
         public Guid? PostedById { get; set; }

@@ -39,6 +39,9 @@
                     </td>
                     <td style="text-align:right">
                         <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
+                        <a asp-route="editJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
+                            Edit
+                        </a> |
                         <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
                             View
                         </a>

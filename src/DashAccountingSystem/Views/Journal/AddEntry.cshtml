@@ -1,5 +1,4 @@
-﻿@using DashAccountingSystem.Data.Models
-@using DashAccountingSystem.Extensions
+﻿@using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
 @model JournalEntryBaseViewModel
 
@@ -33,7 +32,7 @@
     }
 }
 
-<partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
+<partial name="_TenantMastheadAndNavPartial" />
 
 @{
     if (ViewBag.PostBack && ViewBag.SuccessfulSave)
@@ -42,34 +41,31 @@
         var isPosted = detailedModel.PostDate.HasValue;
 
         var successHeadline = isPosted
-            ? $"Journal Entry #{detailedModel.EntryId} successfully saved and posted"
-            : $"Journal Entry #{detailedModel.EntryId} successfully saved";
+            ? $"Entry for Transaction # {detailedModel.EntryId} successfully saved and posted to the journal"
+            : $"Entry for Transaction # {detailedModel.EntryId} successfully saved to the journal and is pending";
 
         <div class="alert alert-success" role="alert">
             <strong>@successHeadline</strong>
         </div>
-        <partial name="_JournalEntryMetadataPartial" for="@detailedModel" />
-        @* TODO: Replace buttons below with links that make sense *@
-        @*       * Add Another and Back to Journal are always present, as well as a View Details *@
-        @*       * Pending Entries also have Edit and Cancel *@
-        <div class="row" style="margin-top: 22px">
-            <div class="col-md-2">
-                <a class="btn btn-success"
-                    asp-route="addJournalEntry"
-                    asp-route-tenantid="@tenant.Id"
-                    role="button">
-                    Add Another
-                </a>
-            </div>
-            <div class="col-md-2">
-                <a class="btn btn-primary"
-                    asp-route="journalIndex"
-                    asp-route-tenantid="@tenant.Id"
-                    role="button">
-                    Back to Journal
-                </a>
-            </div>
+        <div style="margin: 22px auto">
+            <a class="btn btn-success"
+               asp-route="addJournalEntry"
+               asp-route-tenantid="@tenant.Id"
+               role="button"
+               style="margin-right: 22px"
+            >
+                Add Another Entry
+            </a>
+            <a class="btn btn-primary"
+               asp-route="journalIndex"
+               asp-route-tenantid="@tenant.Id"
+               role="button"
+            >
+                Back to Journal
+            </a>
         </div>
+        <partial name="_JournalEntryMetadataPartial" for="@detailedModel" />
+        <partial name="_JournalEntryAccountsPartial" for=" @detailedModel" />
     }
     else
     {
