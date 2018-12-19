@@ -38,7 +38,12 @@ namespace DashAccountingSystem.Controllers
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
             ViewBag.Tenant = tenant;
 
-            return View();
+            var pendingJournalEntries = await _journalEntryRepository.GetPendingJournalEntriesAsync(tenantId);
+            var pendingEntriesViewModel = pendingJournalEntries
+                .Select(JournalEntryDetailedViewModel.FromModel)
+                .ToList();
+
+            return View(pendingEntriesViewModel);
         }
 
         [HttpGet]
@@ -138,7 +143,7 @@ namespace DashAccountingSystem.Controllers
             ViewBag.Tenant = journalEntry.Tenant;
             await HydrateViewBagLookupValues(tenantId, false);
 
-            return View();
+            return View(viewModel);
         }
 
         [HttpGet]

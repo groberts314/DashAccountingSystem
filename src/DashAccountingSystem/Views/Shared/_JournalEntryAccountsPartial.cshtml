@@ -1,0 +1,53 @@
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model JournalEntryDetailedViewModel
+@{
+    var sortedAccounts = Model
+        .Accounts
+        .OrderBy(a => a.AmountType == BalanceType.Debit ? 0 : 1)
+        .ThenBy(a => a.AccountName);
+
+    Func<JournalEntryAccountViewModel, BalanceType, string> showAmount = (account, type) =>
+    {
+        if (type == account.AmountType)
+        {
+            return $"{account.AssetType} {(type == BalanceType.Debit ? account.Debit : account.Credit).ToString("N2")}";
+        }
+
+        return null;
+    };
+
+    <table class="table" style="margin-top:22px; margin-left:22px; width:67%">
+        <thead>
+            <tr>
+                <th class="col-md-6">Account</th>
+                <th class="col-md-3" style="text-align:center">Debit</th>
+                <th class="col-md-3" style="text-align:center">Credit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in sortedAccounts)
+            {
+                <tr>
+                    <td class="col-md-5">@account.AccountName</td>
+                    <td class="col-md-2" style="text-align:right">
+                        @{ 
+                            if (account.AmountType == BalanceType.Debit)
+                            {
+                                <small>@account.AssetType</small> @account.Debit.ToString("N2")
+                            }
+                        }
+                    </td>
+                    <td class="col-md-2" style="text-align:right">
+                        @{
+                            if (account.AmountType == BalanceType.Credit)
+                            {
+                                <small>@account.AssetType</small> @account.Credit.ToString("N2")
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

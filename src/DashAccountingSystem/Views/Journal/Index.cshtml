@@ -1,4 +1,6 @@
-﻿@{
+﻿@using DashAccountingSystem.Models
+@model IEnumerable<JournalEntryDetailedViewModel>
+@{
     ViewData["Title"] = "Journal";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
@@ -16,6 +18,32 @@
 </a>
 
 <div style="margin-top:22px">
-    <p>TODO: Show some existing journal entry stuff...</p>
+    <h3>Pending Journal Entries</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Entry Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in Model)
+            {
+                <tr>
+                    <td>@entry.EntryDate.ToString("d")</td>
+                    <td>@entry.Description</td>
+                    <td><small>@entry.Accounts.First().AssetType</small> @entry.Accounts.Sum(a => a.Debit).ToString("N2")</td>
+                    <td>
+                        <partial name="_PendingJournalEntryLinksPartial" />
+                        <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
+                            View
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 

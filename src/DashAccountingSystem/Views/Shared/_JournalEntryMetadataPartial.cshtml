@@ -2,13 +2,17 @@
 @model JournalEntryDetailedViewModel
 
 @{
-    <div class="list-group" style="margin: auto 15px">
+    <div class="list-group" style="margin: auto 15px; width: 67%">
         <div class="list-group-item row">
-            <div class="col-md-2">Entry Date</div>
+            <div class="col-md-2"><strong>Transaction #</strong></div>
+            <div class="col-md-10">@Model.EntryId</div>
+        </div>
+        <div class="list-group-item row">
+            <div class="col-md-2"><strong>Entry Date</strong></div>
             <div class="col-md-10">@Model.EntryDate.ToString("d")</div>
         </div>
         <div class="list-group-item row">
-            <div class="col-md-2">Status</div>
+            <div class="col-md-2"><strong>Status</strong></div>
             <div class="col-md-10">
                 <partial name="_TransactionStatusPartial" for="@Model.Status" />
             </div>
@@ -16,22 +20,22 @@
         @if (Model.PostDate.HasValue)
         {
             <div class="list-group-item row">
-                <div class="col-md-2">Post Date</div>
+                <div class="col-md-2"><strong>Post Date</strong></div>
                 <div class="col-md-10">@Model.PostDate.Value.ToString("d")</div>
             </div>
         }
         <div class="list-group-item row">
-            <div class="col-md-2">Description</div>
+            <div class="col-md-2"><strong>Description</strong></div>
             <div class="col-md-10">@Model.Description</div>
         </div>
         <div class="list-group-item row">
-            <div class="col-md-2">Check #</div>
+            <div class="col-md-2"><strong>Check #</strong></div>
             <div class="col-md-10">@(Model.CheckNumber?.ToString() ?? "N/A")</div>
         </div>
         @if (!string.IsNullOrWhiteSpace(Model.Note))
         {
             <div class="list-group-item row">
-                <div class="col-md-2">Note</div>
+                <div class="col-md-2"><strong>Note</strong></div>
                 <div class="col-md-10">@Model.Note</div>
             </div>
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
+using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Data.Repositories
 {
@@ -174,7 +175,7 @@ namespace DashAccountingSystem.Data.Repositories
                 .JournalEntry
                 .Include(je => je.AccountingPeriod)
                 .Where(je => je.TenantId == tenantId && je.Status == TransactionStatus.Pending)
-                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
+                .OrderByDescending(je => je.EntryDate)
                 .ThenBy(je => je.Description)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.PostedBy)

@@ -1,0 +1,16 @@
+﻿@using DashAccountingSystem.Models
+@model JournalEntryDetailedViewModel
+
+@{
+    var tenant = ViewBag.Tenant;
+}
+
+<a asp-route="postJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+    Post
+</a> |
+<a asp-route="editJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+    Edit
+</a> |
+<a asp-route="cancelJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+    Cancel
+</a> |

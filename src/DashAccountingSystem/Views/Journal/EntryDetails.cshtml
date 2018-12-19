@@ -1,10 +1,23 @@
-﻿
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model JournalEntryDetailedViewModel
 @{
-    ViewData["Title"] = "AddEntry";
+    ViewData["Title"] = "Journal Entry Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var tenant = ViewBag.Tenant;
+    var isPending = Model.Status == TransactionStatus.Pending;
 }
 
-<h2>Journal Entry Details</h2>
+<partial name="_TenantMastheadAndNavPartial" />
+<partial name="_JournalEntryMetadataPartial" />
+<partial name="_JournalEntryAccountsPartial" />
+<hr />
+<div style="margin-top: 11px">
+    @if (isPending)
+    {
+        <partial name="_PendingJournalEntryLinksPartial" />
+    }
 
-<p>TODO: Show some journal entry stuff...</p>
-
+    <a asp-route="journalIndex" asp-route-tenantid="@tenant.Id">Back to Journal Home</a>
+</div>
