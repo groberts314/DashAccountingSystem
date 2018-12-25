@@ -17,9 +17,10 @@ namespace DashAccountingSystem.Models
 
         public DateTime? CancelDate { get; set; }
 
+        public AccountingPeriodViewModel Period { get; set; }
+
         // TODO: Additional properties if needed
         //       Audit User metadata (for CreatedBy / UpdatedBy / EnteredBy / PostedBy / CanceledBy )
-        //       Accounting Period Metadata
 
         public static JournalEntryDetailedViewModel FromModel(JournalEntry model)
         {
@@ -39,7 +40,8 @@ namespace DashAccountingSystem.Models
                 Status = model.Status,
                 Created = model.Created,
                 Updated = model.Updated,
-                Accounts = model.Accounts.Select(JournalEntryAccountViewModel.FromModel)
+                Accounts = model.Accounts.Select(JournalEntryAccountViewModel.FromModel),
+                Period = AccountingPeriodViewModel.FromModel(model.AccountingPeriod)
             };
         }
     }

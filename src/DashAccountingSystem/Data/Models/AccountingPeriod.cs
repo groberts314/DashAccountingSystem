@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DashAccountingSystem.Data.Models
 {
@@ -25,6 +22,25 @@ namespace DashAccountingSystem.Data.Models
         public byte Month { get; private set; }
 
         public byte Quarter { get; private set; }
+
+        public string QuarterName
+        {
+            get { return $"{Year} Q{Quarter}"; }
+        }
+
+        public string GetName(AccountingPeriodType periodType)
+        {
+            switch (periodType)
+            {
+                case AccountingPeriodType.Year:
+                    return Year.ToString();
+                case AccountingPeriodType.Month:
+                    return Name;
+                case AccountingPeriodType.Quarter:
+                default:
+                    return QuarterName;
+            }
+        }
 
         public AccountingPeriod()
         {

@@ -29,6 +29,8 @@
                 Back to Journal
             </a>
         </div>
+        <partial name="_JournalEntryMetadataPartial" />
+        <partial name="_JournalEntryAccountsPartial" />
     }
     else
     {
@@ -44,16 +46,14 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-6 col-md-3">
+                <div class="col-xs-6 col-sm-4 col-md-3">
                     <div class="form-group">
                         <label asp-for="PostDate">Post Date</label>
                         <input asp-for="PostDate" class="form-control" data-val="true" data-val-required="Post Date is required" />
                         <span asp-validation-for="PostDate" class="text-danger"></span>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
+                <div class="col-xs-12 col-md-7 col-lg-5">
                     <div class="form-group">
                         <label asp-for="Note">Additional Note</label>
                         <textarea asp-for="Note" class="form-control"></textarea>
@@ -61,31 +61,35 @@
                 </div>
             </div>
 
-            <div class="list-group" style="margin: auto 15px; width: 67%">
+            <div class="list-group journal-entry-meta">
                 <div class="list-group-item row">
-                    <div class="col-md-2"><strong>Transaction #</strong></div>
-                    <div class="col-md-4">
+                    <div class="col-xs-3 col-md-2"><strong>Transaction #</strong></div>
+                    <div class="col-xs-3 col-md-4">
                         <input asp-for="EntryId" readonly class="form-control-static" />
                     </div>
-                    <div class="col-md-2"><strong>Entry Date</strong></div>
-                    <div class="col-md-4">
-                        <input asp-for="EntryDate" readonly class="form-control-static" />
+                    <div class="col-xs-3 col-md-2"><strong>Check #</strong></div>
+                    <div class="col-xs-3 col-md-4">
+                        <input asp-for="CheckNumber" readonly class="form-control-static" />
                     </div>
                 </div>
                 <div class="list-group-item row">
-                    <div class="col-md-2"><strong>Status</strong></div>
-                    <div class="col-md-4">
-                        <partial name="_TransactionStatusPartial" for="@Model.Status" />
+                    <div class="col-xs-3 col-md-2"><strong>Entry Date</strong></div>
+                    <div class="col-xs-3 col-md-4">
+                        <input asp-for="EntryDate" readonly class="form-control-static" />
                     </div>
-                    <div class="col-md-2"><strong>Check #</strong></div>
-                    <div class="col-md-4">
-                        <input asp-for="CheckNumber" readonly class="form-control-static" />
+                    <div class="col-xs-3 col-md-2"><strong>Period</strong></div>
+                    <div class="col-xs-3 col-md-4">@Model.Period.QuarterName</div>
+                </div>
+                <div class="list-group-item row">
+                    <div class="col-xs-3 col-md-2"><strong>Status</strong></div>
+                    <div class="col-xs-9 col-md-10">
+                        <partial name="_TransactionStatusPartial" for="@Model.Status" />
                     </div>
                 </div>
                 <div class="list-group-item row">
                     <div class="col-md-2"><strong>Description</strong></div>
                     <div class="col-md-10">
-                        <input asp-for="Description" readonly class="form-control-static" />
+                        <textarea asp-for="Description" readonly class="form-control-static"></textarea>
                     </div>
                 </div>
             </div>
@@ -102,7 +106,7 @@
         (function ($) {
             $(document).ready(function () {
                 var $validationSummaryList = $('.validation-summary-valid ul');
-                var $form = $('#add-entry-form');
+                var $form = $('#post-entry-form');
                 var formValidator = $form.data('validator');
 
                 if (formValidator) {
@@ -121,4 +125,3 @@
         }(jQuery));
     </script>
 }
-

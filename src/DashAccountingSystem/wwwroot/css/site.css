@@ -71,8 +71,26 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
+/* Journal Entry Metadata */
+.journal-entry-meta {
+    margin: auto 15px;
+}
+
+/* Journal Entry Accounts Table */
+.journal-entry-accounts {
+    margin-top: 22px;
+}
+
+.journal-entry-accounts .panel-body {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /* Read-Only Form Input Styled to look like static test */
-input[readonly].form-control, input[readonly].form-control-static {
+input[readonly].form-control,
+input[readonly].form-control-static,
+textarea[readonly].form-control,
+textarea[readonly].form-control-static {
     background-color: transparent;
     border: 0;
     box-shadow: none;
@@ -81,7 +99,17 @@ input[readonly].form-control, input[readonly].form-control-static {
     padding: 0;
 }
 
+textarea[readonly].form-control,
+textarea[readonly].form-control-static {
+    outline: none;
+    overflow-y: auto;
+    resize: none;
+    width: 100%;
+}
+
 /*   END Actually Added Style Rules for all Widths */
+
+/* BEGIN: Style Rules for widths 767px and below (X-SMALL) */
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */
@@ -89,9 +117,34 @@ input[readonly].form-control, input[readonly].form-control-static {
         display: none;
     }
 }
+/* END: Style Rules for widths 767px and below  (X-SMALL) */
 
+/* BEGIN: Style Rules for widths 768px and above (SMALL AND UP) */
 @media screen and (min-width: 768px) {
     .masthead-tenant-name {
         text-align: right;
     }
+    .journal-entry-accounts .panel-body {
+        padding-left: 22px;
+    }
 }
+/* END: Style Rules for widths 768px and above (SMALL AND UP) */
+
+/* BEGIN: Style Rules for widths 992px and above (MEDIUM AND UP) */
+@media screen and (min-width: 992px) {
+    .journal-entry-meta {
+        width: 80%;
+    }
+}
+/* END: Style Rules for widths 992px and above (MEDIUM AND UP) */
+
+/* BEGIN: Style Rules for widths 1200px and above (LARGE AND UP) */
+@media screen and (min-width: 1200px) {
+    .journal-entry-meta {
+        width: 67%;
+    }
+    .journal-entry-accounts .panel-body {
+        margin-right: 55px;
+    }
+}
+/* END: Style Rules for widths 1200px and above (LARGE AND UP) */

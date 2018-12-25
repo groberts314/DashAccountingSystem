@@ -17,37 +17,43 @@
         return null;
     };
 
-    <table class="table" style="margin-top:22px; margin-left:22px; width:67%">
-        <thead>
-            <tr>
-                <th class="col-md-6">Account</th>
-                <th class="col-md-3" style="text-align:center">Debit</th>
-                <th class="col-md-3" style="text-align:center">Credit</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var account in sortedAccounts)
-            {
-                <tr>
-                    <td class="col-md-5">@account.AccountName</td>
-                    <td class="col-md-2" style="text-align:right">
-                        @{ 
-                            if (account.AmountType == BalanceType.Debit)
-                            {
-                                <small>@account.AssetType</small> @account.Debit.ToString("N2")
-                            }
+    <div class="row journal-entry-accounts">
+        <div class="col-xs-12 col-md-10 col-lg-9">
+            <div class="panel-body">
+                <table class="table table-responsive">
+                    <thead>
+                        <tr>
+                            <th class="col-md-6">Account</th>
+                            <th class="col-md-3" style="text-align:center">Debit</th>
+                            <th class="col-md-3" style="text-align:center">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var account in sortedAccounts)
+                        {
+                            <tr>
+                                <td class="col-md-5">@account.AccountName</td>
+                                <td class="col-md-2" style="text-align:right">
+                                    @{
+                                        if (account.AmountType == BalanceType.Debit)
+                                        {
+                                            <small>@account.AssetType</small> @account.Debit.ToString("N2")
+                                        }
+                                    }
+                                </td>
+                                <td class="col-md-2" style="text-align:right">
+                                    @{
+                                        if (account.AmountType == BalanceType.Credit)
+                                        {
+                                            <small>@account.AssetType</small> @account.Credit.ToString("N2")
+                                        }
+                                    }
+                                </td>
+                            </tr>
                         }
-                    </td>
-                    <td class="col-md-2" style="text-align:right">
-                        @{
-                            if (account.AmountType == BalanceType.Credit)
-                            {
-                                <small>@account.AssetType</small> @account.Credit.ToString("N2")
-                            }
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
