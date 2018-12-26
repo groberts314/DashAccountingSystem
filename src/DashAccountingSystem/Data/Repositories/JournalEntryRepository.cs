@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
-using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Data.Repositories
 {
@@ -210,35 +209,52 @@ namespace DashAccountingSystem.Data.Repositories
                     "Journal Entry is not balanced!  It cannot be persisted in this state.",
                     nameof(entry));
 
-            using (var transaction = _db.Database.BeginTransaction())
+            using (var transaction = await _db.Database.BeginTransactionAsync())
             {
-                if (entry.EntryId == 0)
+                try
                 {
-                    entry.EntryId = await GetNextEntryIdAsync(entry.TenantId);
-                }
+                    var tenant = await _db.Tenant.FirstOrDefaultAsync(t => t.Id == entry.TenantId);
+                    if (tenant == null)
+                        throw new ArgumentException(
+                            $"Journal Entry specifies a non-existent Tenant (ID {entry.TenantId}).",
+                            nameof(entry));
 
-                if (entry.AccountingPeriodId == 0)
+                    if (entry.EntryId == 0)
+                    {
+                        entry.EntryId = await GetNextEntryIdAsync(entry.TenantId);
+                    }
+
+                    if (entry.AccountingPeriodId == 0)
+                    {
+                        var accountingPeriod = await _accountingPeriodRepository
+                            .FetchOrCreateAccountingPeriodAsync(
+                                entry.TenantId,
+                                tenant.AccountingPeriodType,
+                                entry.PostDate ?? entry.EntryDate);
+
+                        entry.AccountingPeriodId = accountingPeriod.Id;
+                    }
+
+                    await _db.JournalEntry.AddAsync(entry);
+                    await _db.SaveChangesAsync();
+                    var persistedEntry = await GetDetailedByIdAsync(entry.Id);
+
+                    if (entry.Status == TransactionStatus.Posted)
+                        UpdateAccountsForPostedJournalEntry(persistedEntry);
+                    else
+                        UpdateAccountsForPendingJournalEntry(persistedEntry);
+
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+
+                    return await GetDetailedByIdAsync(entry.Id);
+                }
+                catch (Exception)
                 {
-                    var accountingPeriod = await _accountingPeriodRepository
-                        .FetchOrCreateAccountPeriodAsync(entry.TenantId, entry.PostDate ?? entry.EntryDate);
-
-                    entry.AccountingPeriodId = accountingPeriod.Id;
+                    transaction.Rollback();
+                    throw;
                 }
-
-                await _db.JournalEntry.AddAsync(entry);
-                await _db.SaveChangesAsync();
-                var persistedEntry = await GetDetailedByIdAsync(entry.Id);
-
-                if (entry.Status == TransactionStatus.Posted)
-                    UpdateAccountsForPostedJournalEntry(persistedEntry);
-                else
-                    UpdateAccountsForPendingJournalEntry(persistedEntry);
-
-                await _db.SaveChangesAsync();
-                transaction.Commit();
             }
-
-            return await GetDetailedByIdAsync(entry.Id);
         }
 
         public async Task<JournalEntry> PostJournalEntryAsync(int entryId, DateTime postDate, Guid postedByUserId, string note = null)
@@ -248,31 +264,44 @@ namespace DashAccountingSystem.Data.Repositories
             if (entry == null)
                 return null;
 
-            entry.PostDate = postDate;
-            entry.PostedById = postedByUserId;
-            entry.Status = TransactionStatus.Posted;
-
-            if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
+            using (var transaction = await _db.Database.BeginTransactionAsync())
             {
-                entry.Note = note;
-                entry.Updated = DateTime.UtcNow;
-                entry.UpdatedById = postedByUserId;
+                try
+                {
+                    entry.PostDate = postDate;
+                    entry.PostedById = postedByUserId;
+                    entry.Status = TransactionStatus.Posted;
+
+                    if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
+                    {
+                        entry.Note = note;
+                        entry.Updated = DateTime.UtcNow;
+                        entry.UpdatedById = postedByUserId;
+                    }
+
+                    if (!entry.AccountingPeriod.ContainsDate(postDate))
+                    {
+                        var postDatePeriod = await _accountingPeriodRepository.FetchOrCreateAccountingPeriodAsync(
+                            entry.TenantId,
+                            entry.Tenant.AccountingPeriodType,
+                            postDate);
+
+                        entry.AccountingPeriodId = postDatePeriod.Id;
+                    }
+
+                    UpdateAccountsForPostedJournalEntry(entry);
+
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+
+                    return await GetDetailedByIdAsync(entryId);
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
-
-            if (!entry.AccountingPeriod.ContainsDate(postDate))
-            {
-                var postDatePeriod = await _accountingPeriodRepository.FetchOrCreateAccountPeriodAsync(
-                    entry.TenantId,
-                    postDate);
-
-                entry.AccountingPeriodId = postDatePeriod.Id;
-            }
-
-            UpdateAccountsForPostedJournalEntry(entry);
-
-            await _db.SaveChangesAsync();
-
-            return await GetDetailedByIdAsync(entryId);
         }
 
         private void UpdateAccountsForPostedJournalEntry(JournalEntry entry)

@@ -79,7 +79,9 @@ namespace DashAccountingSystem.Tests
             using (var connection = new NpgsqlConnection(connString))
             {
                 _tenantId = connection.QueryFirstOrDefault<int>(@"
-                    INSERT INTO ""Tenant"" ( ""Name"" ) VALUES ( 'Unit Testing, Inc.' ) RETURNING ""Id"";");
+                    INSERT INTO ""Tenant"" ( ""Name"", ""AccountingPeriodType"" )
+                    VALUES ( 'Unit Testing, Inc.', 1 /* Quarterly Accounting Periods */ )
+                    RETURNING ""Id"";");
             }
         }
 

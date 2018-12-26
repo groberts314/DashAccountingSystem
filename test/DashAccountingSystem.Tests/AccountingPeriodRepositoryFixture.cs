@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
 using Xunit;
+using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
 
 namespace DashAccountingSystem.Tests
@@ -13,26 +14,32 @@ namespace DashAccountingSystem.Tests
 
         [Fact]
         [Trait("Category", "Requires Database")]
-        public void FetchOrCreateAccountPeriod_Ok()
+        public void FetchOrCreateMonthlyAccountingPeriod_Ok()
         {
             lock (TestUtilities.DatabaseSyncLock)
             {
                 try
                 {
-                    InitializeTenant();
+                    InitializeTenant(AccountingPeriodType.Month);
                     Assert.True(_tenantId > 0);
 
                     var repository = GetAccountingPeriodRepository();
                     var year = 2018;
                     var month = (byte)12;
-                    var accountingPeriod0 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
+                    var accountingPeriod0 = repository.FetchOrCreateMonthlyAccountingPeriodAsync(
+                        _tenantId,
+                        year,
+                        month).Result;
                     Assert.NotNull(accountingPeriod0);
                     Assert.True(accountingPeriod0.Id > 0);
                     Assert.Equal(_tenantId, accountingPeriod0.TenantId);
                     Assert.Equal(year, accountingPeriod0.Year);
                     Assert.Equal(month, accountingPeriod0.Month);
 
-                    var fetchedAccountingPeriod0 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, year, month).Result;
+                    var fetchedAccountingPeriod0 = repository.FetchOrCreateMonthlyAccountingPeriodAsync(
+                        _tenantId,
+                        year,
+                        month).Result;
                     Assert.Equal(accountingPeriod0.Id, fetchedAccountingPeriod0.Id);
                     Assert.Equal(_tenantId, fetchedAccountingPeriod0.TenantId);
                     Assert.Equal(year, fetchedAccountingPeriod0.Year);
@@ -41,14 +48,22 @@ namespace DashAccountingSystem.Tests
                     year = 2019;
                     month = 1;
                     var date = new DateTime(year, month, 27);
-                    var accountingPeriod1 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, date).Result;
+                    var accountingPeriod1 = repository.FetchOrCreateAccountingPeriodAsync(
+                        _tenantId,
+                        AccountingPeriodType.Month,
+                        date).Result;
+
                     Assert.NotNull(accountingPeriod1);
                     Assert.True(accountingPeriod1.Id > 0);
                     Assert.Equal(_tenantId, accountingPeriod1.TenantId);
                     Assert.Equal(year, accountingPeriod1.Year);
                     Assert.Equal(month, accountingPeriod1.Month);
 
-                    var fetchedAccountingPeriod1 = repository.FetchOrCreateAccountPeriodAsync(_tenantId, date).Result;
+                    var fetchedAccountingPeriod1 = repository.FetchOrCreateAccountingPeriodAsync(
+                        _tenantId,
+                        AccountingPeriodType.Month,
+                        date).Result;
+
                     Assert.Equal(accountingPeriod1.Id, fetchedAccountingPeriod1.Id);
                     Assert.Equal(_tenantId, fetchedAccountingPeriod1.TenantId);
                     Assert.Equal(year, fetchedAccountingPeriod1.Year);
@@ -61,14 +76,17 @@ namespace DashAccountingSystem.Tests
             }
         }
 
-        private void InitializeTenant()
+        private void InitializeTenant(AccountingPeriodType accountingPeriodType)
         {
             var connString = TestUtilities.GetConnectionString();
 
             using (var connection = new NpgsqlConnection(connString))
             {
                 _tenantId = connection.QueryFirstOrDefault<int>(@"
-                    INSERT INTO ""Tenant"" ( ""Name"" ) VALUES ( 'Unit Testing, Inc.' ) RETURNING ""Id"";");
+                    INSERT INTO ""Tenant"" ( ""Name"", ""AccountingPeriodType"" )
+                    VALUES ( 'Unit Testing, Inc.', @accountingPeriodType )
+                    RETURNING ""Id"";",
+                    new { accountingPeriodType });
             }
         }
 
