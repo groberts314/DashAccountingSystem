@@ -40,7 +40,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "USD $");
 
                     var cashAccount = MakeAccount(
-                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, BalanceType.Debit);
+                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
 
                     var accountTypeRevenue = sharedLookupRepo
                         .GetAccountTypesAsync()
@@ -48,7 +48,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "Revenue");
 
                     var revenueAccount = MakeAccount(
-                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
+                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
 
                     var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
 
@@ -133,7 +133,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "USD $");
 
                     var cashAccount = MakeAccount(
-                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, BalanceType.Debit);
+                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
 
                     var accountTypeRevenue = sharedLookupRepo
                         .GetAccountTypesAsync()
@@ -141,7 +141,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "Revenue");
 
                     var revenueAccount = MakeAccount(
-                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
+                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
 
                     var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
                     var postDate = entryDate.AddDays(3);
@@ -258,7 +258,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "USD $");
 
                     var cashAccount = MakeAccount(
-                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, BalanceType.Debit);
+                        1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
 
                     var accountTypeRevenue = sharedLookupRepo
                         .GetAccountTypesAsync()
@@ -266,7 +266,7 @@ namespace DashAccountingSystem.Tests
                         .FirstOrDefault(at => at.Name == "Revenue");
 
                     var revenueAccount = MakeAccount(
-                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, BalanceType.Credit);
+                        4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
 
                     var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
 
@@ -371,7 +371,7 @@ namespace DashAccountingSystem.Tests
             string name,
             AccountType accountType,
             AssetType assetType,
-            BalanceType balanceType)
+            AmountType balanceType)
         {
             var account = new Account(
                 _tenantId,

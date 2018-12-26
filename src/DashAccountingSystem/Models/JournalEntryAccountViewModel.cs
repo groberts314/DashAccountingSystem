@@ -28,21 +28,21 @@ namespace DashAccountingSystem.Models
         {
             get
             {
-                if (AmountType == BalanceType.Credit)
+                if (AmountType == AmountType.Credit)
                     return -Credit;
                 else
                     return Debit;
             }
         }
 
-        public BalanceType AmountType
+        public AmountType AmountType
         {
             get
             {
                 if (Credit > 0.0m)
-                    return BalanceType.Credit;
+                    return AmountType.Credit;
                 else
-                    return BalanceType.Debit;
+                    return AmountType.Debit;
             }
         }
 
@@ -64,8 +64,8 @@ namespace DashAccountingSystem.Models
                 AccountName = model.Account.DisplayName,
                 AssetType = model.AssetType.Name,
                 AssetTypeId = model.AssetTypeId,
-                Credit = model.AmountType == BalanceType.Credit ? Math.Abs(model.Amount) : 0.0m,
-                Debit = model.AmountType == BalanceType.Debit ? model.Amount : 0.0m
+                Credit = model.AmountType == AmountType.Credit ? Math.Abs(model.Amount) : 0.0m,
+                Debit = model.AmountType == AmountType.Debit ? model.Amount : 0.0m
             };
         }
     }

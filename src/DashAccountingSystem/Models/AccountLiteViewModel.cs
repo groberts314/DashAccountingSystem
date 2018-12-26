@@ -9,7 +9,7 @@ namespace DashAccountingSystem.Models
         public int AccountNumber { get; set; }
         public string Name { get; set; }
         public string DisplayName { get; set; }
-        public BalanceType NormalBalanceType { get; set; }
+        public AmountType NormalBalanceType { get; set; }
         public bool IsBalanceNormal { get; set; }
 
         private DateTime _balanceUpdated;

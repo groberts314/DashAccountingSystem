@@ -36,7 +36,7 @@ namespace DashAccountingSystem.Data.Models
         public AssetType AssetType { get; private set; }
 
         [Required]
-        public BalanceType NormalBalanceType { get; private set; }
+        public AmountType NormalBalanceType { get; private set; }
 
         [Required]
         public decimal CurrentBalance { get; set; }
@@ -71,10 +71,10 @@ namespace DashAccountingSystem.Data.Models
                 if (CurrentBalance == 0.0m)
                     return true;
 
-                if (NormalBalanceType == BalanceType.Debit && CurrentBalance > 0)
+                if (NormalBalanceType == AmountType.Debit && CurrentBalance > 0)
                     return true;
 
-                if (NormalBalanceType == BalanceType.Credit && CurrentBalance < 0)
+                if (NormalBalanceType == AmountType.Credit && CurrentBalance < 0)
                     return true;
 
                 return false;
@@ -88,7 +88,7 @@ namespace DashAccountingSystem.Data.Models
             string description,
             int accountTypeId,
             int assetTypeId,
-            BalanceType normalBalanceType,
+            AmountType normalBalanceType,
             Guid createdById)
         {
             TenantId = tenantId;

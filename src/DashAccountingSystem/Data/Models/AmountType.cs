@@ -1,6 +1,6 @@
 ﻿namespace DashAccountingSystem.Data.Models
 {
-    public enum BalanceType : sbyte
+    public enum AmountType : sbyte
     {
         Debit = 1,
         Credit = -1

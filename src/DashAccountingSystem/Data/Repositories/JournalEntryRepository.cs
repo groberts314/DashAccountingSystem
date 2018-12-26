@@ -292,7 +292,7 @@ namespace DashAccountingSystem.Data.Repositories
         {
             foreach (var account in entry.Accounts)
             {
-                if (account.AmountType == BalanceType.Debit)
+                if (account.AmountType == AmountType.Debit)
                 {
                     account.Account.PendingDebits =
                         (account.Account.PendingDebits ?? 0.0m) + account.Amount;

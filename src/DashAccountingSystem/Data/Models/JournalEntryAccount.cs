@@ -28,9 +28,9 @@ namespace DashAccountingSystem.Data.Models
         [Required]
         public decimal Amount { get; set; }
 
-        public BalanceType AmountType
+        public AmountType AmountType
         {
-            get { return Amount >= 0.0m ? BalanceType.Debit : BalanceType.Credit; }
+            get { return Amount >= 0.0m ? AmountType.Debit : AmountType.Credit; }
         }
 
         public decimal? PreviousBalance { get; set; }

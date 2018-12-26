@@ -4,14 +4,14 @@
 @{
     var sortedAccounts = Model
         .Accounts
-        .OrderBy(a => a.AmountType == BalanceType.Debit ? 0 : 1)
+        .OrderBy(a => a.AmountType == AmountType.Debit ? 0 : 1)
         .ThenBy(a => a.AccountName);
 
-    Func<JournalEntryAccountViewModel, BalanceType, string> showAmount = (account, type) =>
+    Func<JournalEntryAccountViewModel, AmountType, string> showAmount = (account, type) =>
     {
         if (type == account.AmountType)
         {
-            return $"{account.AssetType} {(type == BalanceType.Debit ? account.Debit : account.Credit).ToString("N2")}";
+            return $"{account.AssetType} {(type == AmountType.Debit ? account.Debit : account.Credit).ToString("N2")}";
         }
 
         return null;
@@ -35,7 +35,7 @@
                                 <td class="col-md-5">@account.AccountName</td>
                                 <td class="col-md-2" style="text-align:right">
                                     @{
-                                        if (account.AmountType == BalanceType.Debit)
+                                        if (account.AmountType == AmountType.Debit)
                                         {
                                             <small>@account.AssetType</small> @account.Debit.ToString("N2")
                                         }
@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="col-md-2" style="text-align:right">
                                     @{
-                                        if (account.AmountType == BalanceType.Credit)
+                                        if (account.AmountType == AmountType.Credit)
                                         {
                                             <small>@account.AssetType</small> @account.Credit.ToString("N2")
                                         }

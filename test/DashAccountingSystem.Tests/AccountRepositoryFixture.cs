@@ -45,7 +45,7 @@ namespace DashAccountingSystem.Tests
                         "Primary business checking account.",
                         accountTypeAsset.Id,
                         assetTypeUSD.Id,
-                        BalanceType.Debit,
+                        AmountType.Debit,
                         _userId);
 
                     var savedAccount = accountRepo.CreateAccountAsync(account).Result;
