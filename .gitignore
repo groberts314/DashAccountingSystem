@@ -340,3 +340,4 @@ ASALocalRun/
 .mfractor/
 
 src/DashAccountingSystem/Data/Scripts/dash-chart-of-accounts\.sql
+src/DashAccountingSystem/Data/Scripts/dash-transactions\.sql
