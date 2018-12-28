@@ -1,6 +1,8 @@
 /* DANGER - Don't do it unless you mean it! */
 /* Affects all tenants!                     */
 
+TRUNCATE TABLE "AccountingPeriodClosingBalance";
+
 UPDATE "Account"
    SET "PendingDebits" = NULL
       ,"PendingCredits" = NULL

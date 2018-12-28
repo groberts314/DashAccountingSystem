@@ -10,6 +10,7 @@
 src/DashAccountingSystem/wwwroot/js
 src/DashAccountingSystem/wwwroot/lib
 src/DashAccountingSystem/Content/Scripts/**/*.js
+src/DashAccountingSystem/Data/Scripts/Dash
 
 # Defaults from Visual Studio template .gitignore
 
@@ -338,6 +339,3 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-
-src/DashAccountingSystem/Data/Scripts/dash-chart-of-accounts\.sql
-src/DashAccountingSystem/Data/Scripts/dash-transactions\.sql
