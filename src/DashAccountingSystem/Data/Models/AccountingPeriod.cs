@@ -27,6 +27,8 @@ namespace DashAccountingSystem.Data.Models
 
         public byte Quarter { get; private set; }
 
+        public bool Closed { get; set; }
+
         public AccountingPeriod()
         {
 

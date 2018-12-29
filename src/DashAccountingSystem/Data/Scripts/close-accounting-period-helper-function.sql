@@ -145,6 +145,11 @@ BEGIN
           ,"Updated" = (now() AT TIME ZONE 'UTC')
           ,"UpdatedById" = GEOFFREY
      WHERE "AccountingPeriodId" = the_accounting_period_id;
+ 
+    -- Mark the Period as Closed
+    UPDATE "AccountingPeriod"
+       SET "Closed" = TRUE
+     WHERE "Id" = the_accounting_period_id;
 
     RETURN 0;
 END
