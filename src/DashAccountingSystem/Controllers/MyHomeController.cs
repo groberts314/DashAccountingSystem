@@ -19,7 +19,7 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> Index()
         {
             // TODO: Get a List of _AUTHORIZED_ Tenants for Current User
-            //       If None, render empty view
+            //       If None, render empty view or Unauthorized/Forbidden or something
             //       If 1, redirect to /Ledger/{TenantId}/Accounts
             //       If Multiple, render list view
 

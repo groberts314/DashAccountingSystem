@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
@@ -104,6 +106,24 @@ namespace DashAccountingSystem.Data.Repositories
             await _db.SaveChangesAsync();
 
             return newAccountingPeriod;
+        }
+
+        public async Task<AccountingPeriod> GetByIdAsync(int accountingPeriodId)
+        {
+            return await _db
+                .AccountingPeriod
+                .FirstOrDefaultAsync(ap => ap.Id == accountingPeriodId);
+        }
+
+        // TODO: Pagination...???
+        public async Task<IEnumerable<AccountingPeriod>> GetByTenantAsync(int tenantId)
+        {
+            return await _db
+                .AccountingPeriod
+                .Where(ap => ap.TenantId == tenantId)
+                .OrderByDescending(ap => ap.Year)
+                .ThenByDescending(ap => ap.Month)
+                .ToListAsync();
         }
     }
 }

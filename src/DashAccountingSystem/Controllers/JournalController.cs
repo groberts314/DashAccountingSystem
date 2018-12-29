@@ -13,17 +13,20 @@ namespace DashAccountingSystem.Controllers
     public class JournalController : Controller
     {
         private readonly IAccountRepository _accountRepository = null;
+        private readonly IAccountingPeriodRepository _accountingPeriodRepository = null;
         private readonly IJournalEntryRepository _journalEntryRepository = null;
         private readonly ISharedLookupRepository _sharedLookupRepository = null;
         private readonly ITenantRepository _tenantRepository = null; 
 
         public JournalController(
             IAccountRepository accountRepository,
+            IAccountingPeriodRepository accountingPeriodRepository,
             IJournalEntryRepository journalEntryRepository,
             ISharedLookupRepository sharedLookupRepository,
             ITenantRepository tenantRepository)
         {
             _accountRepository = accountRepository;
+            _accountingPeriodRepository = accountingPeriodRepository;
             _journalEntryRepository = journalEntryRepository;
             _sharedLookupRepository = sharedLookupRepository;
             _tenantRepository = tenantRepository;
@@ -31,19 +34,45 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal", Name = "journalIndex")]
-        public async Task<IActionResult> Index(int tenantId)
+        public async Task<IActionResult> Index(
+            [FromRoute] int tenantId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
 
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
             ViewBag.Tenant = tenant;
 
+            // Resolve Current Accounting Period and add to View Bag
+            await HydrateViewBagAccountingPeriod(tenant);
+
+            // TODO: Fetch other Past/Closed (or occasionally Future) Periods for a Period Picker ... ???
+
             var pendingJournalEntries = await _journalEntryRepository.GetPendingJournalEntriesAsync(tenantId);
             var pendingEntriesViewModel = pendingJournalEntries
                 .Select(JournalEntryDetailedViewModel.FromModel)
                 .ToList();
 
+            // TODO: Select paginated non-Pending journal entries from the period and include in view model
+
             return View(pendingEntriesViewModel);
+        }
+
+        [HttpGet]
+        [Route("Ledger/{tenantId:int}/Journal/Period/{accountingPeriodId:int}", Name = "journalPeriodIndex")]
+        public async Task<IActionResult> Index(
+            [FromRoute] int tenantId,
+            [FromRoute] int accountingPeriodId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+            ViewBag.Tenant = tenant;
+
+            await HydrateViewBagAccountingPeriod(tenant, accountingPeriodId);
+
+            return View();
         }
 
         [HttpGet]
@@ -83,6 +112,9 @@ namespace DashAccountingSystem.Controllers
                 // Perform additional validation (i.e. represents a non-empty, valid, balanced transaction)
                 // TODO: Move most of this to an attribute hopefully
                 isJournalEntryValid = journalEntryViewModel.Validate(ModelState);
+
+                // TODO: Validate Accounting Period based on Post Date coalesce Entry Date
+                //       It is an error to try and add a Journal Entry to a Closed Accounting Period!
             }
 
             if (!isJournalEntryValid)
@@ -151,6 +183,7 @@ namespace DashAccountingSystem.Controllers
         public async Task<IActionResult> PostEntry(int tenantId, int entryId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
+            // TODO: Somehow handle invalid request to Post an Entry in any state other than Pending
 
             ViewBag.PostBack = false;
             ViewBag.SuccessfulSave = false;
@@ -177,6 +210,9 @@ namespace DashAccountingSystem.Controllers
                 {
                     ModelState.AddModelError("PostDate", "Post date is required to post the journal entry");
                 }
+
+                // TODO: Validate Accounting Period based on Post Date
+                //       It is an error to try and add a Journal Entry to a Closed Accounting Period!
             }
 
             if (!isJournalEntryValid)
@@ -233,7 +269,7 @@ namespace DashAccountingSystem.Controllers
             if (hydrateTenant)
             {
                 var tenant = accounts.HasAny() ? accounts.Select(a => a.Tenant).First() : null;
-                await HydrateViewTenant(tenantId, tenant);
+                await HydrateViewBagTenant(tenantId, tenant);
             }
         }
 
@@ -243,7 +279,7 @@ namespace DashAccountingSystem.Controllers
             ViewBag.Tenant = fetchedTenant;
         }
 
-        private async Task HydrateViewTenant(int tenantId, Tenant tenant)
+        private async Task HydrateViewBagTenant(int tenantId, Tenant tenant)
         {
             if (tenant != null)
             {
@@ -252,6 +288,26 @@ namespace DashAccountingSystem.Controllers
             }
 
             await HydrateViewBagTenant(tenantId);
+        }
+
+        private async Task HydrateViewBagAccountingPeriod(Tenant tenant, int? accountingPeriodId = null)
+        {
+            AccountingPeriod accountingPeriod = null;
+
+            if (accountingPeriodId.HasValue)
+            {
+                accountingPeriod = await _accountingPeriodRepository.GetByIdAsync(accountingPeriodId.Value);
+            }
+            else
+            {
+                accountingPeriod = await _accountingPeriodRepository
+                    .FetchOrCreateAccountingPeriodAsync(
+                        tenant.Id,
+                        tenant.AccountingPeriodType,
+                        DateTime.Today); // TODO: Time Zone ...???
+            }
+
+            ViewBag.AccountingPeriod = accountingPeriod;
         }
     }
 }

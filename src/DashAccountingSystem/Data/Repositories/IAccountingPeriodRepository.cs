@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DashAccountingSystem.Data.Models;
 
@@ -24,5 +25,10 @@ namespace DashAccountingSystem.Data.Repositories
         Task<AccountingPeriod> FetchOrCreateYearlyAccountingPeriodAsync(
             int tenantId,
             int year);
+
+        Task<AccountingPeriod> GetByIdAsync(int accountingPeriodId);
+
+        // TODO: Pagination...???
+        Task<IEnumerable<AccountingPeriod>> GetByTenantAsync(int tenantId);
     }
 }
