@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
+using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Data.Repositories
 {
@@ -74,47 +75,9 @@ namespace DashAccountingSystem.Data.Repositories
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<JournalEntry>> GetJournalEntriesAsync(int tenantId, int pageNumber, int pageSize)
-        {
-            return await _db
-                .JournalEntry
-                .Include(je => je.AccountingPeriod)
-                .Where(je =>
-                    je.TenantId == tenantId)
-                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
-                .ThenBy(je => je.Description)
-                .Skip(pageNumber - 1 * pageSize)
-                .Take(pageSize)
-                .Include(je => je.CreatedBy)
-                .Include(je => je.PostedBy)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.Account)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.AssetType)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<JournalEntry>> GetJournalEntriesForMonthAsync(int tenantId, int year, byte month)
-        {
-            return await _db
-                .JournalEntry
-                .Include(je => je.AccountingPeriod)
-                .Where(je =>
-                    je.TenantId == tenantId &&
-                    je.AccountingPeriod.Year == year &&
-                    je.AccountingPeriod.Month == month)
-                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
-                .ThenBy(je => je.Description)
-                .Include(je => je.CreatedBy)
-                .Include(je => je.PostedBy)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.Account)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.AssetType)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<JournalEntry>> GetJournalEntriesForPeriodAsync(int accountingPeriodId)
+        public async Task<PagedResult<JournalEntry>> GetJournalEntriesForPeriodAsync(
+            int accountingPeriodId,
+            Pagination pagination)
         {
             return await _db
                 .JournalEntry
@@ -128,44 +91,7 @@ namespace DashAccountingSystem.Data.Repositories
                     .ThenInclude(jeAcct => jeAcct.Account)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.AssetType)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<JournalEntry>> GetJournalEntriesForQuarterAsync(int tenantId, int year, byte quarter)
-        {
-            return await _db
-                .JournalEntry
-                .Include(je => je.AccountingPeriod)
-                .Where(je =>
-                    je.TenantId == tenantId &&
-                    je.AccountingPeriod.Year == year &&
-                    je.AccountingPeriod.Quarter == quarter)
-                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
-                .ThenBy(je => je.Description)
-                .Include(je => je.CreatedBy)
-                .Include(je => je.PostedBy)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.Account)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.AssetType)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<JournalEntry>> GetJournalEntriesForYearAsync(int tenantId, int year)
-        {
-            return await _db
-                .JournalEntry
-                .Include(je => je.AccountingPeriod)
-                .Where(je => je.TenantId == tenantId && je.AccountingPeriod.Year == year)
-                .OrderByDescending(je => je.PostDate ?? je.EntryDate)
-                .ThenBy(je => je.Description)
-                .Include(je => je.CreatedBy)
-                .Include(je => je.PostedBy)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.Account)
-                .Include(je => je.Accounts)
-                    .ThenInclude(jeAcct => jeAcct.AssetType)
-                .ToListAsync();
+                .GetPagedAsync(pagination);
         }
 
         public async Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesAsync(int tenantId)

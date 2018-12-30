@@ -37,7 +37,7 @@
                                     @{
                                         if (account.AmountType == AmountType.Debit)
                                         {
-                                            <small>@account.AssetType</small> @account.Debit.ToString("N2")
+                                            <small class="asset-type text-muted">@account.AssetType</small> @account.Debit.ToString("N2")
                                         }
                                     }
                                 </td>
@@ -45,7 +45,7 @@
                                     @{
                                         if (account.AmountType == AmountType.Credit)
                                         {
-                                            <small>@account.AssetType</small> @account.Credit.ToString("N2")
+                                            <small class="asset-type text-muted">@account.AssetType</small> @account.Credit.ToString("N2")
                                         }
                                     }
                                 </td>

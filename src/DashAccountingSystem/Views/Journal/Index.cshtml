@@ -1,13 +1,12 @@
 ﻿@using DashAccountingSystem.Data.Models
 @using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
-@model IEnumerable<JournalEntryDetailedViewModel>
+@model JournalViewModel
 @{
     ViewData["Title"] = "Journal";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var tenant = ViewBag.Tenant;
-    var selectedAccountingPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
@@ -23,43 +22,23 @@
 <div style="margin-top:22px">
 @{
     <h3>Pending Journal Entries</h3>
-    if (!Model.HasAny())
+    if (!Model.PendingEntries.HasAny())
     {
         <p>There are no pending journal entries</p>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="col-md-2">Entry Date</th>
-                    <th class="col-md-5">Description</th>
-                    <th class="col-md-2">Amount</th>
-                    <th class="col-md-3"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var entry in Model)
-                {
-                    <tr>
-                        <td>@entry.EntryDate.ToString("d")</td>
-                        <td>@entry.Description</td>
-                        <td style="text-align:right">
-                            <small>@entry.Accounts.First().AssetType</small> @entry.Accounts.Sum(a => a.Debit).ToString("N2")
-                        </td>
-                        <td style="text-align:right">
-                            <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
-                            <a asp-route="editJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
-                                Edit
-                            </a> |
-                            <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <partial name="_PendingJournalEntriesTablePartial" for="PendingEntries" />
+    }
+
+    <h3>Entries</h3>
+    if (!Model.Entries.Results.HasAny())
+    {
+        <p>There are no journal entries yet for this period</p>
+    }
+    else
+    {
+        <partial name="_JournalEntriesTablePartial" for="Entries" />
     }
 }
 </div>

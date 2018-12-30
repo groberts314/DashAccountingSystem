@@ -107,6 +107,10 @@ textarea[readonly].form-control-static {
     width: 100%;
 }
 
+small.asset-type {
+    font-size: 67%;
+}
+
 /*   END Actually Added Style Rules for all Widths */
 
 /* BEGIN: Style Rules for widths 767px and below (X-SMALL) */

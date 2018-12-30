@@ -14,11 +14,7 @@ namespace DashAccountingSystem.Data.Repositories
         Task<JournalEntry> GetDetailedByIdAsync(int journalEntryId);
         Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(int tenantId, int entryId);
 
-        Task<IEnumerable<JournalEntry>> GetJournalEntriesAsync(int tenantId, int pageNumber, int pageSize);
-        Task<IEnumerable<JournalEntry>> GetJournalEntriesForMonthAsync(int tenantId, int year, byte month);
-        Task<IEnumerable<JournalEntry>> GetJournalEntriesForPeriodAsync(int accountingPeriodId);
-        Task<IEnumerable<JournalEntry>> GetJournalEntriesForQuarterAsync(int tenantId, int year, byte quarter);
-        Task<IEnumerable<JournalEntry>> GetJournalEntriesForYearAsync(int tenantId, int year);
+        Task<PagedResult<JournalEntry>> GetJournalEntriesForPeriodAsync(int accountingPeriodId, Pagination pagination);
 
         Task<int> GetNextEntryIdAsync(int tenantId);
 

@@ -14,14 +14,10 @@ namespace DashAccountingSystem.Controllers
     public class LedgerAccountsController : Controller
     {
         private readonly IAccountRepository _accountRepository = null;
-        private readonly ITenantRepository _tenantRepository = null;
 
-        public LedgerAccountsController(
-            IAccountRepository accountRepository,
-            ITenantRepository tenantRepository)
+        public LedgerAccountsController(IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
-            _tenantRepository = tenantRepository;
         }
 
         [HttpGet]

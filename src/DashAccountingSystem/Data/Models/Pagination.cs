@@ -97,6 +97,10 @@ namespace DashAccountingSystem.Data.Models
 
         // TODO: PageSize should be limited to some reasonable value (e.g., see PaginationValidationFilterAttribute.cs)
 
-        public static Pagination Default => new Pagination { PageNumber = 1 /* API documentation indicates default (starting) page is 1-based */, PageSize = int.MaxValue };
+        public static Pagination Default => new Pagination
+        {
+            PageNumber = 1, /* Using 1-based page numbers  */
+            PageSize = int.MaxValue
+        };
     }
 }

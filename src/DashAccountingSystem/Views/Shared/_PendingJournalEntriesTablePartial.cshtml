@@ -1,0 +1,35 @@
+﻿@using System.Collections.Generic
+@using DashAccountingSystem.Models
+@model IEnumerable<JournalEntryDetailedViewModel>
+@{ 
+    var tenant = ViewBag.Tenant;
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-md-2">Entry Date</th>
+            <th class="col-md-5">Description</th>
+            <th class="col-md-2">Amount</th>
+            <th class="col-md-3"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>@entry.EntryDate.ToString("d")</td>
+                <td>@entry.Description</td>
+                <td style="text-align:right">
+                    <small class="asset-type text-muted">@entry.Accounts.First().AssetType</small> @entry.Accounts.Sum(a => a.Debit).ToString("N2")
+                </td>
+                <td style="text-align:right">
+                    <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
+
+                    <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
+                        View
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

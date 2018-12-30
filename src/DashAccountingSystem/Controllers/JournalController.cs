@@ -14,32 +14,26 @@ namespace DashAccountingSystem.Controllers
     public class JournalController : Controller
     {
         private readonly IAccountRepository _accountRepository = null;
-        private readonly IAccountingPeriodRepository _accountingPeriodRepository = null;
         private readonly IJournalEntryRepository _journalEntryRepository = null;
         private readonly ISharedLookupRepository _sharedLookupRepository = null;
-        private readonly ITenantRepository _tenantRepository = null; 
 
         public JournalController(
             IAccountRepository accountRepository,
-            IAccountingPeriodRepository accountingPeriodRepository,
             IJournalEntryRepository journalEntryRepository,
-            ISharedLookupRepository sharedLookupRepository,
-            ITenantRepository tenantRepository)
+            ISharedLookupRepository sharedLookupRepository)
         {
             _accountRepository = accountRepository;
-            _accountingPeriodRepository = accountingPeriodRepository;
             _journalEntryRepository = journalEntryRepository;
             _sharedLookupRepository = sharedLookupRepository;
-            _tenantRepository = tenantRepository;
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal", Name = "journalIndex")]
         [TenantViewDataFilter]
+        [PaginationValidationFilter]
         public async Task<IActionResult> Index(
             [FromRoute] int tenantId,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] PaginationViewModel pagination)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
 
@@ -48,19 +42,39 @@ namespace DashAccountingSystem.Controllers
                 .Select(JournalEntryDetailedViewModel.FromModel)
                 .ToList();
 
-            // TODO: Select paginated non-Pending journal entries from the period and include in view model
+            var selectedPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
+            var paginationModel = ViewBag.Pagination as Pagination;
 
-            return View(pendingEntriesViewModel);
+            var paginatedEntries = await _journalEntryRepository.GetJournalEntriesForPeriodAsync(
+                selectedPeriod.Id,
+                paginationModel);
+
+            var paginatedEntriesViewModel = new PagedResult<JournalEntryDetailedViewModel>()
+            {
+                Pagination = paginatedEntries.Pagination,
+                Results = paginatedEntries
+                    .Results
+                    .Select(JournalEntryDetailedViewModel.FromModel)
+                    .ToList()
+            };
+
+            var resultViewModel = new JournalViewModel()
+            {
+                PendingEntries = pendingEntriesViewModel,
+                Entries = paginatedEntriesViewModel
+            };
+
+            return View(resultViewModel);
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Period/{accountingPeriodId:int}", Name = "journalPeriodIndex")]
         [TenantViewDataFilter]
+        [PaginationValidationFilter]
         public async Task<IActionResult> Index(
             [FromRoute] int tenantId,
             [FromRoute] int accountingPeriodId,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] PaginationViewModel pagination)
         {
             await Task.FromResult(0);
             return View();

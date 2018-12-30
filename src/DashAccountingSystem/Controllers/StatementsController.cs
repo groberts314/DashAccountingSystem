@@ -11,11 +11,8 @@ namespace DashAccountingSystem.Controllers
 {
     public class StatementsController : Controller
     {
-        private readonly ITenantRepository _tenantRepository = null;
-
-        public StatementsController(ITenantRepository tenantRepository)
+        public StatementsController()
         {
-            _tenantRepository = tenantRepository;
         }
 
         [HttpGet]
