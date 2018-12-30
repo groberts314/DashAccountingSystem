@@ -1,22 +1,39 @@
-﻿@using DashAccountingSystem.Extensions
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
 @model JournalViewModel
 @{
     ViewData["Title"] = "Journal";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var tenant = ViewBag.Tenant;
+    var tenant = ViewBag.Tenant as Tenant;
+    var accountingPeriods = ViewBag.AccountingPeriods as List<AccountingPeriodViewModel>;
+    var selectedPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-<a class="btn btn-primary"
-   asp-route="addJournalEntry"
-   asp-route-tenantid="@tenant.Id"
-   role="button"
->
-    Add Entry
-</a>
+<div class="row">
+    <div class="col-md-6">
+        <a class="btn btn-primary"
+           asp-route="addJournalEntry"
+           asp-route-tenantid="@tenant.Id"
+           role="button">
+            Add Entry
+        </a>
+    </div>
+    <div class="col-md-6 pull-right" style="text-align:right">
+        Select accounting period:&nbsp;
+        <select id="acct-period-selector" class="selectpicker" asp-for="@selectedPeriod.Id" data-width="auto">
+            @foreach (var accountingPeriod in accountingPeriods)
+            {
+                <option value="@accountingPeriod.Id">
+                    @accountingPeriod.Name @(accountingPeriod.Closed ? " (closed)" : accountingPeriod.Current ? " (current)" : null)
+                </option>
+            }
+        </select>
+    </div>
+</div>
 
 <div style="margin-top:22px">
 @{
@@ -41,4 +58,23 @@
     }
 }
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function ($) {
+            $(document).ready(function () {
+                $acctPeriodSelector = $('#acct-period-selector');
+                $acctPeriodSelector.change(function () {
+                    var selectedValue = this.value;
+                    var selectedText = $acctPeriodSelector.find('option:selected').text();
+
+                    if (selectedText.indexOf('current') > -1)
+                        window.location.href = '/Ledger/@tenant.Id/Journal';
+                    else
+                        window.location.href = '/Ledger/@tenant.Id/Journal/Period/' + selectedValue;
+                });
+            });
+        }(jQuery));
+    </script>
+}
 
