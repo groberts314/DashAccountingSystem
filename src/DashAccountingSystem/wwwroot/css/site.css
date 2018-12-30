@@ -72,7 +72,7 @@ input[type=number] {
 }
 
 /* Journal Entry Metadata */
-.journal-entry-meta {
+.meta-data-table {
     margin: auto 15px;
 }
 
@@ -136,7 +136,7 @@ small.asset-type {
 
 /* BEGIN: Style Rules for widths 992px and above (MEDIUM AND UP) */
 @media screen and (min-width: 992px) {
-    .journal-entry-meta {
+    .meta-data-table {
         width: 80%;
     }
 }
@@ -144,7 +144,7 @@ small.asset-type {
 
 /* BEGIN: Style Rules for widths 1200px and above (LARGE AND UP) */
 @media screen and (min-width: 1200px) {
-    .journal-entry-meta {
+    .meta-data-table {
         width: 67%;
     }
     .journal-entry-accounts .panel-body {
