@@ -7,16 +7,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var tenant = ViewBag.Tenant;
-    var accountingPeriod = ViewBag.AccountingPeriod as AccountingPeriod;
-    var isClosed = accountingPeriod?.Closed ?? false;
-    var isCurrentPeriod = accountingPeriod != null && accountingPeriod.ContainsDate(DateTime.Today); // TODO: Time Zone...???
+    var selectedAccountingPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
-
-<div style="margin-top:22px; margin-bottom: 22px;">
-    <strong>Period:</strong> @accountingPeriod.Name @(isClosed ? " (closed)" : isCurrentPeriod ? " (current)" : null)
-</div>
 
 <a class="btn btn-primary"
    asp-route="addJournalEntry"

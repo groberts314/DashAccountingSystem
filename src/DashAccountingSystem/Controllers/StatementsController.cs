@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystem.Data.Repositories;
+using DashAccountingSystem.Filters;
 using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
@@ -19,25 +20,28 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Statements", Name = "statementsIndex")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> Index(int tenantId)
         {
-            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
-            ViewBag.Tenant = tenant;
-
+            await Task.FromResult(0);
             return View();
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Statements/BalanceSheet", Name = "balanceSheet")]
-        public IActionResult BalanceSheet(int tenantId)
+        [TenantViewDataFilter]
+        public async Task<IActionResult> BalanceSheet(int tenantId)
         {
+            await Task.FromResult(0);
             return View();
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Statements/ProfitAndLoss", Name = "profitAndLoss")]
-        public IActionResult ProfitAndLoss(int tenantId)
+        [TenantViewDataFilter]
+        public async Task<IActionResult> ProfitAndLoss(int tenantId)
         {
+            await Task.FromResult(0);
             return View();
         }
     }

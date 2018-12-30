@@ -1,5 +1,12 @@
-﻿@{
-    var tenant = ViewBag.Tenant;
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@{
+    // Tenant
+    var tenant = ViewBag.Tenant as Tenant;
+
+    // Accounting Periods
+    var selectedAccountingPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
+
     var controller = ViewContext.RouteData.Values["Controller"];
     var isActiveRoute = new string[] { "LedgerAccounts", "Journal", "Statements" }
         .Select(route => new KeyValuePair<string, bool>(route, string.Equals(controller, route)))
@@ -12,6 +19,14 @@
     </div>
     <div class="col-sm-6 masthead-tenant-name">
         <h4>@tenant.Name</h4>
+        <div>
+            <span>Selected Period:&nbsp;</span>
+            <span>
+                <strong>
+                    @selectedAccountingPeriod.Name @(selectedAccountingPeriod.Closed ? " (closed)" : selectedAccountingPeriod.Current ? " (current)" : null)
+                </strong>
+            </span>
+        </div>
     </div>
 </div>
 

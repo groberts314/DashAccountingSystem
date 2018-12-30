@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
 using DashAccountingSystem.Extensions;
+using DashAccountingSystem.Filters;
 using DashAccountingSystem.Models;
 
 namespace DashAccountingSystem.Controllers
@@ -34,20 +35,13 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal", Name = "journalIndex")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> Index(
             [FromRoute] int tenantId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
-
-            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
-            ViewBag.Tenant = tenant;
-
-            // Resolve Current Accounting Period and add to View Bag
-            await HydrateViewBagAccountingPeriod(tenant);
-
-            // TODO: Fetch other Past/Closed (or occasionally Future) Periods for a Period Picker ... ???
 
             var pendingJournalEntries = await _journalEntryRepository.GetPendingJournalEntriesAsync(tenantId);
             var pendingEntriesViewModel = pendingJournalEntries
@@ -61,27 +55,25 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Period/{accountingPeriodId:int}", Name = "journalPeriodIndex")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> Index(
             [FromRoute] int tenantId,
             [FromRoute] int accountingPeriodId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
-            ViewBag.Tenant = tenant;
-
-            await HydrateViewBagAccountingPeriod(tenant, accountingPeriodId);
-
+            await Task.FromResult(0);
             return View();
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntry")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> AddEntry(int tenantId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
 
-            await HydrateViewBagLookupValues(tenantId, true);
+            await HydrateViewBagLookupValues(tenantId);
 
             ViewBag.PostBack = false;
             ViewBag.SuccessfulSave = false;
@@ -95,6 +87,7 @@ namespace DashAccountingSystem.Controllers
 
         [HttpPost]
         [Route("Ledger/{tenantId:int}/Journal/Entry/Add", Name = "addJournalEntryPost")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> AddEntry(
             [FromRoute] int tenantId,
             JournalEntryBaseViewModel journalEntryViewModel)
@@ -119,11 +112,12 @@ namespace DashAccountingSystem.Controllers
 
             if (!isJournalEntryValid)
             {
-                await HydrateViewBagLookupValues(tenantId, true);
+                await HydrateViewBagLookupValues(tenantId);
                 return View(journalEntryViewModel);
             }
 
             var contextUserId = User.GetUserId();
+            var postingUserId = journalEntryViewModel.PostDate.HasValue ? contextUserId : (Guid?)null;
 
             var journalEntry = new JournalEntry(
                 tenantId,
@@ -132,7 +126,7 @@ namespace DashAccountingSystem.Controllers
                 journalEntryViewModel.Description,
                 journalEntryViewModel.CheckNumber,
                 contextUserId,
-                journalEntryViewModel.PostDate.HasValue ? contextUserId : (Guid?)null);
+                postingUserId);
 
             if (!string.IsNullOrWhiteSpace(journalEntryViewModel.Note))
                 journalEntry.Note = journalEntryViewModel.Note;
@@ -154,6 +148,7 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}", Name = "journalEntryDetails")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> EntryDetails(int tenantId, int entryId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
@@ -162,6 +157,7 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Edit", Name = "editJournalEntry")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> EditEntry(int tenantId, int entryId)
         {
             var journalEntry = await _journalEntryRepository.GetDetailedByTenantAndEntryIdAsync(tenantId, entryId);
@@ -170,16 +166,15 @@ namespace DashAccountingSystem.Controllers
             if (journalEntry == null)
                 return NotFound();
 
+            await HydrateViewBagLookupValues(tenantId);
             var viewModel = JournalEntryDetailedViewModel.FromModel(journalEntry);
-
-            ViewBag.Tenant = journalEntry.Tenant;
-            await HydrateViewBagLookupValues(tenantId, false);
 
             return View(viewModel);
         }
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Post", Name = "postJournalEntry")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> PostEntry(int tenantId, int entryId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
@@ -193,6 +188,7 @@ namespace DashAccountingSystem.Controllers
 
         [HttpPost]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Post", Name = "postJournalEntryPost")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> PostEntry(
             int tenantId,
             int entryId,
@@ -237,6 +233,7 @@ namespace DashAccountingSystem.Controllers
 
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Cancel", Name = "cancelPendingJournalEntry")]
+        [TenantViewDataFilter]
         public async Task<IActionResult> CancelPendingEntry(int tenantId, int entryId)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
@@ -253,61 +250,16 @@ namespace DashAccountingSystem.Controllers
 
             var viewModel = JournalEntryDetailedViewModel.FromModel(journalEntry);
 
-            ViewBag.Tenant = journalEntry.Tenant;
-
             return View(viewModel);
         }
 
-        private async Task HydrateViewBagLookupValues(int tenantId, bool hydrateTenant)
+        private async Task HydrateViewBagLookupValues(int tenantId)
         {
             var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
             var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
 
             ViewBag.AccountList = new CategorizedAccountsViewModel(accounts);
             ViewBag.AssetTypes = assetTypes;
-
-            if (hydrateTenant)
-            {
-                var tenant = accounts.HasAny() ? accounts.Select(a => a.Tenant).First() : null;
-                await HydrateViewBagTenant(tenantId, tenant);
-            }
-        }
-
-        private async Task HydrateViewBagTenant(int tenantId)
-        {
-            var fetchedTenant = await _tenantRepository.GetTenantAsync(tenantId);
-            ViewBag.Tenant = fetchedTenant;
-        }
-
-        private async Task HydrateViewBagTenant(int tenantId, Tenant tenant)
-        {
-            if (tenant != null)
-            {
-                ViewBag.Tenant = tenant;
-                return;
-            }
-
-            await HydrateViewBagTenant(tenantId);
-        }
-
-        private async Task HydrateViewBagAccountingPeriod(Tenant tenant, int? accountingPeriodId = null)
-        {
-            AccountingPeriod accountingPeriod = null;
-
-            if (accountingPeriodId.HasValue)
-            {
-                accountingPeriod = await _accountingPeriodRepository.GetByIdAsync(accountingPeriodId.Value);
-            }
-            else
-            {
-                accountingPeriod = await _accountingPeriodRepository
-                    .FetchOrCreateAccountingPeriodAsync(
-                        tenant.Id,
-                        tenant.AccountingPeriodType,
-                        DateTime.Today); // TODO: Time Zone ...???
-            }
-
-            ViewBag.AccountingPeriod = accountingPeriod;
         }
     }
 }
