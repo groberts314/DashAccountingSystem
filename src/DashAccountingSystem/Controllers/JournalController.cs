@@ -143,6 +143,17 @@ namespace DashAccountingSystem.Controllers
         }
 
         [HttpGet]
+        [Route(
+            "Ledger/{tenantId:int}/Journal/Period/{accountingPeriodId:int}/Entry/{entryId:int}",
+            Name = "journalPeriodEntryDetails")]
+        [TenantViewDataFilter]
+        public async Task<IActionResult> EntryDetails(int tenantId, int accountingPeriodId, int entryId)
+        {
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+            return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
+        }
+
+        [HttpGet]
         [Route("Ledger/{tenantId:int}/Journal/Entry/{entryId:int}/Edit", Name = "editJournalEntry")]
         [TenantViewDataFilter]
         public async Task<IActionResult> EditEntry(int tenantId, int entryId)

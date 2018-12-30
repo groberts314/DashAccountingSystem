@@ -2,7 +2,23 @@
 @using DashAccountingSystem.Models
 @model PagedResult<JournalEntryDetailedViewModel>
 @{
-    var tenant = ViewBag.Tenant;
+    const string entryDetailsAction = "EntryDetails";
+
+    var tenant = ViewBag.Tenant as Tenant;
+    var controller = ViewContext.RouteData.Values["Controller"];
+    var action = ViewContext.RouteData.Values["Action"];
+
+    object accountingPeriodIdParam = null;
+    int accountingPeriodIdParsed = 0;
+    ViewContext.RouteData.Values.TryGetValue("accountingPeriodId", out accountingPeriodIdParam);
+    var accountingPeriodId = accountingPeriodIdParam != null &&
+        int.TryParse(accountingPeriodIdParam.ToString(), out accountingPeriodIdParsed)
+        ? accountingPeriodIdParsed
+        : (int?)null;
+
+    var accountingPeriodIdRouteParamValue = accountingPeriodId.HasValue
+        ? accountingPeriodId.ToString()
+        : null;
 }
 <table class="table">
     <thead>
@@ -29,7 +45,12 @@
                     {
                         <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
                     }
-                    <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
+                    <a asp-controller="@controller"
+                       asp-action="@entryDetailsAction"
+                       asp-route-tenantId="@tenant.Id"
+                       asp-route-accountingPeriodId="@accountingPeriodIdRouteParamValue"
+                       asp-route-entryId="@entry.EntryId"
+                    >
                         View
                     </a>
                 </td>
@@ -41,22 +62,12 @@
 @{
     var prevDisabled = Model.Pagination.PageNumber == 1 ? "disabled" : "";
     var nextDisabled = !Model.Pagination.ContainsMoreRecords ? "disabled" : "";
-    var controller = ViewContext.RouteData.Values["Controller"];
-    var action = ViewContext.RouteData.Values["Action"];
-
-    object accountingPeriodIdParam = null;
-    int accountingPeriodIdParsed = 0;
-    ViewContext.RouteData.Values.TryGetValue("accountingPeriodId", out accountingPeriodIdParam);
-    var accountingPeriodId = accountingPeriodIdParam != null &&
-        int.TryParse(accountingPeriodIdParam.ToString(), out accountingPeriodIdParsed)
-        ? accountingPeriodIdParsed
-        : (int?)null;
 }
 
 <a asp-controller="@controller"
    asp-action="@action"
    asp-route-tenantId="@tenant.Id"
-   asp-route-accountingPeriodId="@(accountingPeriodId.HasValue ? accountingPeriodId.ToString() : null)"
+   asp-route-accountingPeriodId="@accountingPeriodIdRouteParamValue"
    asp-route-pageNumber="@(Model.Pagination.PageNumber - 1)"
    asp-route-pageSize="@(Model.Pagination.PageSize)"
    class="btn btn-default @prevDisabled"
@@ -65,7 +76,7 @@
 </a>
 <a asp-controller="@controller"
    asp-action="@action"
-   asp-route-accountingPeriodId="@(accountingPeriodId.HasValue ? accountingPeriodId.ToString() : null)"
+   asp-route-accountingPeriodId="@accountingPeriodIdRouteParamValue"
    asp-route-tenantId="@tenant.Id"
    asp-route-pageNumber="@(Model.Pagination.PageNumber + 1)"
    asp-route-pageSize="@Model.Pagination.PageSize"
