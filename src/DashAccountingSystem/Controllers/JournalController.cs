@@ -36,35 +36,7 @@ namespace DashAccountingSystem.Controllers
             [FromQuery] PaginationViewModel pagination)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
-
-            var pendingJournalEntries = await _journalEntryRepository.GetPendingJournalEntriesAsync(tenantId);
-            var pendingEntriesViewModel = pendingJournalEntries
-                .Select(JournalEntryDetailedViewModel.FromModel)
-                .ToList();
-
-            var selectedPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
-            var paginationModel = ViewBag.Pagination as Pagination;
-
-            var paginatedEntries = await _journalEntryRepository.GetJournalEntriesForPeriodAsync(
-                selectedPeriod.Id,
-                paginationModel);
-
-            var paginatedEntriesViewModel = new PagedResult<JournalEntryDetailedViewModel>()
-            {
-                Pagination = paginatedEntries.Pagination,
-                Results = paginatedEntries
-                    .Results
-                    .Select(JournalEntryDetailedViewModel.FromModel)
-                    .ToList()
-            };
-
-            var resultViewModel = new JournalViewModel()
-            {
-                PendingEntries = pendingEntriesViewModel,
-                Entries = paginatedEntriesViewModel
-            };
-
-            return View(resultViewModel);
+            return await HandleJournalEntryIndexRequest();
         }
 
         [HttpGet]
@@ -76,8 +48,9 @@ namespace DashAccountingSystem.Controllers
             [FromRoute] int accountingPeriodId,
             [FromQuery] PaginationViewModel pagination)
         {
-            await Task.FromResult(0);
-            return View();
+            // TODO: Either in here or in an attribute, verify authorization for the tenant
+            //       and that the specified period belongs to the tenant
+            return await HandleJournalEntryIndexRequest();
         }
 
         [HttpGet]
@@ -252,6 +225,41 @@ namespace DashAccountingSystem.Controllers
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
             return await HandleJournalEntryDetailsReadRequest(tenantId, entryId);
+        }
+
+        private async Task<IActionResult> HandleJournalEntryIndexRequest()
+        {
+            var selectedPeriod = ViewBag.SelectedPeriod as AccountingPeriodViewModel;
+
+            var pendingJournalEntries = await _journalEntryRepository
+                .GetPendingJournalEntriesForPeriodAsync(selectedPeriod.Id);
+
+            var pendingEntriesViewModel = pendingJournalEntries
+                .Select(JournalEntryDetailedViewModel.FromModel)
+                .ToList();
+
+            var pagination = ViewBag.Pagination as Pagination;
+
+            var paginatedEntries = await _journalEntryRepository.GetJournalEntriesForPeriodAsync(
+                selectedPeriod.Id,
+                pagination);
+
+            var paginatedEntriesViewModel = new PagedResult<JournalEntryDetailedViewModel>()
+            {
+                Pagination = paginatedEntries.Pagination,
+                Results = paginatedEntries
+                    .Results
+                    .Select(JournalEntryDetailedViewModel.FromModel)
+                    .ToList()
+            };
+
+            var resultViewModel = new JournalViewModel()
+            {
+                PendingEntries = null,
+                Entries = paginatedEntriesViewModel
+            };
+
+            return View(resultViewModel);
         }
 
         private async Task<IActionResult> HandleJournalEntryDetailsReadRequest(int tenantId, int entryId)

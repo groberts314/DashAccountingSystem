@@ -18,7 +18,7 @@ namespace DashAccountingSystem.Data.Repositories
 
         Task<int> GetNextEntryIdAsync(int tenantId);
 
-        Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesAsync(int tenantId);
+        Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesForPeriodAsync(int accountingPeriodId);
 
         Task<JournalEntry> PostJournalEntryAsync(int entryId, DateTime postDate, Guid postedByUserId, string note = null);
     }

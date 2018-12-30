@@ -94,14 +94,14 @@ namespace DashAccountingSystem.Data.Repositories
                 .GetPagedAsync(pagination);
         }
 
-        public async Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesAsync(int tenantId)
+        public async Task<IEnumerable<JournalEntry>> GetPendingJournalEntriesForPeriodAsync(int accountingPeriodId)
         {
             return await _db
                 .JournalEntry
-                .Include(je => je.AccountingPeriod)
-                .Where(je => je.TenantId == tenantId && je.Status == TransactionStatus.Pending)
+                .Where(je => je.AccountingPeriodId == accountingPeriodId && je.Status == TransactionStatus.Pending)
                 .OrderByDescending(je => je.EntryDate)
                 .ThenBy(je => je.Description)
+                .Include(je => je.AccountingPeriod)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.PostedBy)
                 .Include(je => je.Accounts)

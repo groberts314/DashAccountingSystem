@@ -1,7 +1,7 @@
 ﻿@using DashAccountingSystem.Data.Models
 @using DashAccountingSystem.Models
 @model PagedResult<JournalEntryDetailedViewModel>
-@{ 
+@{
     var tenant = ViewBag.Tenant;
 }
 <table class="table">
@@ -37,3 +37,39 @@
         }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = Model.Pagination.PageNumber == 1 ? "disabled" : "";
+    var nextDisabled = !Model.Pagination.ContainsMoreRecords ? "disabled" : "";
+    var controller = ViewContext.RouteData.Values["Controller"];
+    var action = ViewContext.RouteData.Values["Action"];
+
+    object accountingPeriodIdParam = null;
+    int accountingPeriodIdParsed = 0;
+    ViewContext.RouteData.Values.TryGetValue("accountingPeriodId", out accountingPeriodIdParam);
+    var accountingPeriodId = accountingPeriodIdParam != null &&
+        int.TryParse(accountingPeriodIdParam.ToString(), out accountingPeriodIdParsed)
+        ? accountingPeriodIdParsed
+        : (int?)null;
+}
+
+<a asp-controller="@controller"
+   asp-action="@action"
+   asp-route-tenantId="@tenant.Id"
+   asp-route-accountingPeriodId="@(accountingPeriodId.HasValue ? accountingPeriodId.ToString() : null)"
+   asp-route-pageNumber="@(Model.Pagination.PageNumber - 1)"
+   asp-route-pageSize="@(Model.Pagination.PageSize)"
+   class="btn btn-default @prevDisabled"
+>
+    Previous
+</a>
+<a asp-controller="@controller"
+   asp-action="@action"
+   asp-route-accountingPeriodId="@(accountingPeriodId.HasValue ? accountingPeriodId.ToString() : null)"
+   asp-route-tenantId="@tenant.Id"
+   asp-route-pageNumber="@(Model.Pagination.PageNumber + 1)"
+   asp-route-pageSize="@Model.Pagination.PageSize"
+   class="btn btn-default @nextDisabled"
+>
+    Next
+</a>
