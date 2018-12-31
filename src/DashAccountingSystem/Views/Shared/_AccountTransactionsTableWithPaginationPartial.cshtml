@@ -1,0 +1,30 @@
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model PagedResult<AccountTransactionViewModel>
+@{
+    var tenant = ViewBag.Tenant as Tenant;
+    var prevDisabled = Model.Pagination.PageNumber == 1 ? "disabled" : "";
+    var nextDisabled = !Model.Pagination.ContainsMoreRecords ? "disabled" : "";
+    var accountId = Model.Results.Select(tx => tx.AccountId).First();
+}
+
+<partial name="_AccountTransactionsTablePartial" for="Results" />
+
+<a asp-route="accountDetails"
+   asp-route-tenantId="@tenant.Id"
+   asp-route-accountId="@accountId"
+   asp-route-pageNumber="@(Model.Pagination.PageNumber - 1)"
+   asp-route-pageSize="@(Model.Pagination.PageSize)"
+   class="btn btn-default @prevDisabled"
+>
+    Previous
+</a>
+<a asp-route="accountDetails"
+   asp-route-tenantId="@tenant.Id"
+   asp-route-accountId="@accountId"
+   asp-route-pageNumber="@(Model.Pagination.PageNumber + 1)"
+   asp-route-pageSize="@Model.Pagination.PageSize"
+   class="btn btn-default @nextDisabled"
+>
+    Next
+</a>

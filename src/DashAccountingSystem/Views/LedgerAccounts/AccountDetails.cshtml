@@ -83,19 +83,19 @@
     }
     else
     {
-        <partial name="_AccountPendingTransactionsTablePartial" for="PendingTransactions" />
+        <partial name="_AccountTransactionsTablePartial" for="PendingTransactions" />
     }
 }
 
 <h4>Posted Transactions</h4>
 @{
-    if (!Model.PostedTransactions.Results.HasAny())
+    if (!Model.PostedTransactions.HasAny())
     {
         <p>There are no posted transactions</p>
     }
     else
     {
-        <partial name="_AccountPostedTransactionsTablePartial" for="PostedTransactions" />
+        <partial name="_AccountTransactionsTableWithPaginationPartial" for="PostedTransactions" />
     }
 }
 

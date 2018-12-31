@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Data.Models
 {
@@ -14,6 +12,11 @@ namespace DashAccountingSystem.Data.Models
         public PagedResult()
         {
             Results = new List<TModel>();
+        }
+
+        public bool HasAny()
+        {
+            return Results.HasAny();
         }
     }
 }
