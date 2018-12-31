@@ -37,7 +37,7 @@
 
 <div style="margin-top:22px">
 @{
-    <h3>Pending Journal Entries</h3>
+    <h3>Pending Entries</h3>
     if (!Model.PendingEntries.HasAny())
     {
         <p>There are no pending journal entries</p>
@@ -47,7 +47,7 @@
         <partial name="_PendingJournalEntriesTablePartial" for="PendingEntries" />
     }
 
-    <h3>Entries</h3>
+    <h3>All Entries</h3>
     if (!Model.Entries.Results.HasAny())
     {
         <p>There are no journal entries yet for this period</p>

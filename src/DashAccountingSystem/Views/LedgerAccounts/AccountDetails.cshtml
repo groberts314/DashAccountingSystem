@@ -1,104 +1,73 @@
-﻿@model DashAccountingSystem.Data.Models.Account
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model AccountDetailsViewModel
 
 @{
-    ViewData["Title"] = "Account Details";
+    var account = Model.Account;
+    ViewData["Title"] = account.AccountNumber + " - " + account.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    const string amountFormat = "#,##0.00;(#,##0.00)";
 
-    var createdBy = Model.CreatedBy != null ? $"{Model.CreatedBy.FirstName} {Model.CreatedBy.LastName}" : string.Empty;
-    var updatedBy = Model.UpdatedBy != null ? $"{Model.UpdatedBy.FirstName} {Model.UpdatedBy.LastName}" : string.Empty;
+    var pendingDebits = account.PendingDebits ?? 0.0m;
+    var pendingCredits = account.PendingCredits ?? 0.0m;
+    var pendingBalance = account.CurrentBalance + pendingDebits - pendingCredits;
+    var isPendingBalanceNormal = account.NormalBalanceType == AmountType.Debit
+        ? pendingBalance >= 0.0m
+        : pendingBalance <= 0.0m;
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-<div>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Tenant)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Tenant.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.AccountNumber)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.AccountNumber)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.AccountType)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.AccountType.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.AssetType)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.AssetType.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.NormalBalanceType)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.NormalBalanceType)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CurrentBalance)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CurrentBalance)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Created)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => createdBy)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Updated)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Updated)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.UpdatedBy)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => updatedBy)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.BalanceUpdated)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.BalanceUpdated)
-        </dd>
-    </dl>
-</div>
-<div>
+<div style="margin: 22px auto 22px 22px">
     <a asp-route="editAccount"
-     asp-route-tenantid="@Model.Tenant.Id"
-     asp-route-accountid="@Model.Id"
-    >
+       asp-route-tenantid="@account.TenantId"
+       asp-route-accountid="@account.Id">
         Edit
     </a> |
-    <a asp-route="accountsIndex" asp-route-tenantid="@Model.Tenant.Id">Back to List</a>
+    <a asp-route="accountsIndex" asp-route-tenantid="@account.TenantId">Back to List</a>
 </div>
+
+<div>
+    <dl class="dl-horizontal account-meta-data">
+        <dt>Account #</dt>
+        <dd>@account.AccountNumber</dd>
+        <dt>Name</dt>
+        <dd>@account.Name</dd>
+        <dt>Account Type</dt>
+        <dd>@account.AccountType.Name</dd>
+        <dt>Normal Balance</dt>
+        <dd>@account.NormalBalanceType</dd>
+        <dt>Last Transaction</dt>
+        <dd>@account.BalanceUpdated.ToString("g")</dd>
+    </dl>
+</div>
+
+<table class="table table-condensed table-striped meta-data-table">
+    <tbody>
+        <tr>
+            <td>Current Balance</td>
+            <td class="text-@(account.IsBalanceNormal ? "success" : "danger")" style="text-align: right">
+                <small class="asset-type text-muted">@account.AssetType.Name</small> @account.CurrentBalance.ToString(amountFormat)
+            </td>
+        </tr>
+        <tr>
+            <td>Pending Debits</td>
+            <td style="text-align: right">
+                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingDebits.ToString(amountFormat)
+            </td>
+        </tr>
+        <tr>
+            <td>Pending Credits</td>
+            <td style="text-align: right">
+                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingCredits.ToString(amountFormat)
+            </td>
+        </tr>
+        <tr style="font-weight: bold">
+            <td>Pending Balance</td>
+            <td class="text-@(isPendingBalanceNormal ? "success" : "danger")" style="text-align: right">
+                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingBalance.ToString(amountFormat)
+            </td>
+        </tr>
+    </tbody>
+</table>

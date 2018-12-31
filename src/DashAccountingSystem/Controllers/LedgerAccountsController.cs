@@ -58,7 +58,12 @@ namespace DashAccountingSystem.Controllers
             // TODO: Get pending and recently posted transactions and use an enhanced view model
             //       instead of raw Account model
 
-            return View(account);
+            var resultViewModel = new AccountDetailsViewModel()
+            {
+                Account = account
+            };
+
+            return View(resultViewModel);
         }
 
         [HttpGet]

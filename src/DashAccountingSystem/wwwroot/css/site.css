@@ -51,6 +51,14 @@ body {
     text-align: right;
 }
 
+/* Account Details */
+.account-meta-data {
+    margin-left: 22px;
+}
+.account-meta-data dt {
+    text-align: left;
+}
+
 /* Asset Selector Glyphicons */
 .filter-option-inner-inner .glyphicon {
     left: 0px;
@@ -84,6 +92,18 @@ input[type=number] {
 .journal-entry-accounts .panel-body {
     padding-left: 0;
     padding-right: 0;
+}
+
+/* Journal Entry Transaction Status Label */
+.transaction-status {
+    display: inline;
+    padding: 5px 15px;
+}
+.journal-entries-table .transaction-status {
+    display: inline-block;
+    margin-bottom: 0;
+    padding: 0 15px;
+    width: 100%;
 }
 
 /* Read-Only Form Input Styled to look like static test */

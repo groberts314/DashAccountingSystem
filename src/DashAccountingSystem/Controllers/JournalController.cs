@@ -266,7 +266,7 @@ namespace DashAccountingSystem.Controllers
 
             var resultViewModel = new JournalViewModel()
             {
-                PendingEntries = null,
+                PendingEntries = pendingEntriesViewModel,
                 Entries = paginatedEntriesViewModel
             };
 
