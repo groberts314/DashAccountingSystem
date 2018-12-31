@@ -1,0 +1,8 @@
+﻿@using DashAccountingSystem.Models
+@model AmountViewModel
+@{
+    if (Model.HasValue)
+    {
+        <small class="asset-type text-muted">@(Model.AssetType.Symbol ?? Model.AssetType.Name)</small> @(Math.Abs(Model.Amount.Value).ToString("N2"))
+    }
+}

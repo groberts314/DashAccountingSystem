@@ -1,0 +1,10 @@
+﻿@using DashAccountingSystem.Models
+@model AmountViewModel
+@{
+    const string amountFormatString = "#,##0.00;(#,##0.00)";
+
+    if (Model.HasValue)
+    {
+        <small class="asset-type text-muted">@(Model.AssetType.Symbol ?? Model.AssetType.Name)</small> @Model.Amount.Value.ToString(amountFormatString)
+    }
+}

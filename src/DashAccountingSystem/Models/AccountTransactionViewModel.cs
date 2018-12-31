@@ -39,39 +39,35 @@ namespace DashAccountingSystem.Models
 
         // Account Level
         public int AccountId { get; set; }
-        public string AssetType { get; set; }
-        public decimal Amount { get; set; }
+        public AmountViewModel Amount { get; set; }
 
         public AmountType AmountType
         {
             get
             {
-                if (Amount < 0.0m)
-                    return AmountType.Credit;
-                else
-                    return AmountType.Debit;
+                return Amount.AmountType;
             }
         }
 
-        public decimal? Debit
+        public AmountViewModel Debit
         {
             get
             {
                 if (AmountType == AmountType.Debit)
                     return Amount;
 
-                return null;
+                return AmountViewModel.Empty;
             }
         }
 
-        public decimal? Credit
+        public AmountViewModel Credit
         {
             get
             {
                 if (AmountType == AmountType.Credit)
-                    return -Amount;
+                    return Amount;
 
-                return null;
+                return AmountViewModel.Empty;
             }
         }
 
@@ -98,8 +94,7 @@ namespace DashAccountingSystem.Models
                 Status = model.JournalEntry.Status,
                 Period = AccountingPeriodLiteViewModel.FromModel(model.JournalEntry.AccountingPeriod),
                 AccountId = model.AccountId,
-                AssetType = model.AssetType.Name,
-                Amount = model.Amount,
+                Amount = new AmountViewModel(model.Amount, model.AssetType),
                 PreviousBalance = model.PreviousBalance,
                 NewBalance = model.NewBalance
             };

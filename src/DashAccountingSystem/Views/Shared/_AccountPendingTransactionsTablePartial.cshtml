@@ -24,16 +24,10 @@
             <td>@transaction.Description</td>
             <td>@(transaction.CheckNumber.HasValue ? transaction.CheckNumber.ToString() : null)</td>
             <td style="text-align: right">
-                @if (transaction.AmountType == AmountType.Debit)
-                {
-                    <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Debit.Value.ToString("N2")
-                }
+                <partial name="_AbsoluteAmountPartial" for="@transaction.Debit" />
             </td>
             <td style="text-align: right">
-                @if (transaction.AmountType == AmountType.Credit)
-                {
-                    <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Credit.Value.ToString("N2")
-                }
+                <partial name="_AbsoluteAmountPartial" for="@transaction.Credit" />
             </td>
             <td style="text-align: right">
                 <partial name="_JournalEntryActionLinksPartial" for="@transaction" />

@@ -17,34 +17,28 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var transaction in Model.Results)
-        {
-            <tr>
-                <td>@transaction.Date.ToString("d")</td>
-                <td>@transaction.Description</td>
-                <td>@(transaction.CheckNumber.HasValue ? transaction.CheckNumber.ToString() : null)</td>
-                <td style="text-align: right">
-                    @if (transaction.AmountType == AmountType.Debit)
-                    {
-                        <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Debit.Value.ToString("N2")
-                    }
-                </td>
-                <td style="text-align: right">
-                    @if (transaction.AmountType == AmountType.Credit)
-                    {
-                        <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Credit.Value.ToString("N2")
-                    }
-                </td>
-                <td style="text-align: right">
-                    <partial name="_JournalEntryActionLinksPartial" for="@transaction" />
-                    <a asp-route="journalEntryDetails"
-                       asp-route-tenantId="@tenant.Id"
-                       asp-route-entryId="@transaction.EntryId">
-                        View
-                    </a>
-                </td>
-            </tr>
-        }
+    @foreach (var transaction in Model.Results)
+    {
+        <tr>
+            <td>@transaction.Date.ToString("d")</td>
+            <td>@transaction.Description</td>
+            <td>@(transaction.CheckNumber.HasValue ? transaction.CheckNumber.ToString() : null)</td>
+            <td style="text-align: right">
+                <partial name="_AbsoluteAmountPartial" for="@transaction.Debit" />
+            </td>
+            <td style="text-align: right">
+                <partial name="_AbsoluteAmountPartial" for="@transaction.Credit" />
+            </td>
+            <td style="text-align: right">
+                <partial name="_JournalEntryActionLinksPartial" for="@transaction" />
+                <a asp-route="journalEntryDetails"
+                    asp-route-tenantId="@tenant.Id"
+                    asp-route-entryId="@transaction.EntryId">
+                    View
+                </a>
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 
