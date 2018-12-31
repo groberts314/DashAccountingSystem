@@ -24,8 +24,10 @@ namespace DashAccountingSystem.Models
             {
                 switch (Status)
                 {
+                    case TransactionStatus.Closed:
                     case TransactionStatus.Posted:
                         return PostDate.Value;
+
                     case TransactionStatus.Pending:
                     default:
                         return EntryDate;
@@ -36,6 +38,7 @@ namespace DashAccountingSystem.Models
         public AccountingPeriodLiteViewModel Period { get; set; }
 
         // Account Level
+        public int AccountId { get; set; }
         public string AssetType { get; set; }
         public decimal Amount { get; set; }
 
@@ -94,6 +97,7 @@ namespace DashAccountingSystem.Models
                 CancelDate = model.JournalEntry.CancelDate,
                 Status = model.JournalEntry.Status,
                 Period = AccountingPeriodLiteViewModel.FromModel(model.JournalEntry.AccountingPeriod),
+                AccountId = model.AccountId,
                 AssetType = model.AssetType.Name,
                 Amount = model.Amount,
                 PreviousBalance = model.PreviousBalance,

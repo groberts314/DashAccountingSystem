@@ -7,6 +7,6 @@ namespace DashAccountingSystem.Models
     {
         public Account Account { get; set; }
         public IEnumerable<AccountTransactionViewModel> PendingTransactions { get; set; }
-        public PagedResult<AccountTransactionViewModel> Transactions { get; set; }
+        public PagedResult<AccountTransactionViewModel> PostedTransactions { get; set; }
     }
 }

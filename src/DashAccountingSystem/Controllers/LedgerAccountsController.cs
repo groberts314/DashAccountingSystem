@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystem.Data.Models;
 using DashAccountingSystem.Data.Repositories;
-using DashAccountingSystem.Extensions;
 using DashAccountingSystem.Filters;
 using DashAccountingSystem.Models;
 
@@ -62,12 +59,21 @@ namespace DashAccountingSystem.Controllers
             // Get pending transactions
             var pendingTransactions = await _accountRepository.GetPendingTransactionsAsync(accountId);
 
-            // TODO: Get posted transactions
+            // Get posted transactions
+            var paginationModel = ViewBag.Pagination as Pagination;
+            var paginatedPostedTransactions = await _accountRepository.GetPostedTransactionsAsync(
+                accountId,
+                paginationModel);
 
             var resultViewModel = new AccountDetailsViewModel()
             {
                 Account = account,
-                PendingTransactions = pendingTransactions.Select(AccountTransactionViewModel.FromModel)
+                PendingTransactions = pendingTransactions.Select(AccountTransactionViewModel.FromModel),
+                PostedTransactions = new PagedResult<AccountTransactionViewModel>()
+                {
+                    Pagination = paginatedPostedTransactions.Pagination,
+                    Results = paginatedPostedTransactions.Results.Select(AccountTransactionViewModel.FromModel)
+                }
             };
 
             return View(resultViewModel);

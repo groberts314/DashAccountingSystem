@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystem.Data.Models;
+using DashAccountingSystem.Extensions;
 
 namespace DashAccountingSystem.Data.Repositories
 {
@@ -58,15 +59,27 @@ namespace DashAccountingSystem.Data.Repositories
                     jeAcct.AccountId == accountId &&
                     jeAcct.JournalEntry.Status == TransactionStatus.Pending)
                 .OrderByDescending(jeAcct => jeAcct.JournalEntry.EntryDate)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.EntryId)
                 .Include(jeAcct => jeAcct.JournalEntry.AccountingPeriod)
                 .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
                 .ToListAsync();
 
         }
 
-        public Task<PagedResult<JournalEntryAccount>> GetPostedTransactionsAsync(int accountId, Pagination pagination)
+        public async Task<PagedResult<JournalEntryAccount>> GetPostedTransactionsAsync(int accountId, Pagination pagination)
         {
-            throw new NotImplementedException();
+            return await _db
+                .JournalEntryAccount
+                .Include(jeAcct => jeAcct.JournalEntry)
+                .Where(jeAcct =>
+                    jeAcct.AccountId == accountId &&
+                    (jeAcct.JournalEntry.Status == TransactionStatus.Posted ||
+                     jeAcct.JournalEntry.Status == TransactionStatus.Closed))
+                .OrderByDescending(jeAcct => jeAcct.JournalEntry.PostDate)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.EntryId)
+                .Include(jeAcct => jeAcct.JournalEntry.AccountingPeriod)
+                .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
+                .GetPagedAsync(pagination);
         }
     }
 }

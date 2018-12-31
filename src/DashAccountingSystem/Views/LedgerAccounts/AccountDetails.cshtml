@@ -76,12 +76,26 @@
 </table>
 
 <h4>Pending Transactions</h4>
-@if (!Model.PendingTransactions.HasAny())
-{
-    <p>There are no pending journal entries</p>
+@{
+    if (!Model.PendingTransactions.HasAny())
+    {
+        <p>There are no pending transactions</p>
+    }
+    else
+    {
+        <partial name="_AccountPendingTransactionsTablePartial" for="PendingTransactions" />
+    }
 }
-else
-{
-    <partial name="_AccountPendingTransactionsTablePartial" for="PendingTransactions" />
+
+<h4>Posted Transactions</h4>
+@{
+    if (!Model.PostedTransactions.Results.HasAny())
+    {
+        <p>There are no posted transactions</p>
+    }
+    else
+    {
+        <partial name="_AccountPostedTransactionsTablePartial" for="PostedTransactions" />
+    }
 }
 
