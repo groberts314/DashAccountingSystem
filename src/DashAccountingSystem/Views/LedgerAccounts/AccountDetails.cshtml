@@ -1,5 +1,4 @@
-﻿@using DashAccountingSystem.Data.Models
-@using DashAccountingSystem.Extensions
+﻿@using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
 @model AccountDetailsViewModel
 
@@ -8,14 +7,7 @@
     ViewData["Title"] = account.AccountNumber + " - " + account.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    const string amountFormat = "#,##0.00;(#,##0.00)";
-
-    var pendingDebits = account.PendingDebits ?? 0.0m;
-    var pendingCredits = account.PendingCredits ?? 0.0m;
-    var pendingBalance = account.CurrentBalance + pendingDebits - pendingCredits;
-    var isPendingBalanceNormal = account.NormalBalanceType == AmountType.Debit
-        ? pendingBalance >= 0.0m
-        : pendingBalance <= 0.0m;
+    const string timeZoneId = "America/Los_Angeles"; // TODO: Make this a user preference or something...
 }
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
@@ -42,7 +34,7 @@
         <dt>Normal Balance</dt>
         <dd>@account.NormalBalanceType</dd>
         <dt>Last Transaction</dt>
-        <dd>@account.BalanceUpdated.ToString("g")</dd>
+        <dd>@account.BalanceUpdated.WithTimeZone(timeZoneId).ToString("g")</dd>
     </dl>
 </div>
 
@@ -51,25 +43,25 @@
         <tr>
             <td>Current Balance</td>
             <td class="text-@(account.IsBalanceNormal ? "success" : "danger")" style="text-align: right">
-                <small class="asset-type text-muted">@account.AssetType.Name</small> @account.CurrentBalance.ToString(amountFormat)
+                <partial name="_AmountPartial" for="Account.CurrentBalance" />
             </td>
         </tr>
         <tr>
             <td>Pending Debits</td>
             <td style="text-align: right">
-                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingDebits.ToString(amountFormat)
+                <partial name="_AmountPartial" for="Account.PendingDebits" />
             </td>
         </tr>
         <tr>
             <td>Pending Credits</td>
             <td style="text-align: right">
-                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingCredits.ToString(amountFormat)
+                <partial name="_AmountPartial" for="Account.PendingCredits" />
             </td>
         </tr>
         <tr style="font-weight: bold">
             <td>Pending Balance</td>
-            <td class="text-@(isPendingBalanceNormal ? "success" : "danger")" style="text-align: right">
-                <small class="asset-type text-muted">@account.AssetType.Name</small> @pendingBalance.ToString(amountFormat)
+            <td class="text-@(account.IsPendingBalanceNormal ? "success" : "danger")" style="text-align: right">
+                <partial name="_AmountPartial" for="Account.PendingBalance" />
             </td>
         </tr>
     </tbody>

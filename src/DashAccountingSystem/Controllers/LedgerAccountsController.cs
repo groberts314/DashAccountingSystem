@@ -67,7 +67,7 @@ namespace DashAccountingSystem.Controllers
 
             var resultViewModel = new AccountDetailsViewModel()
             {
-                Account = account,
+                Account = AccountDisplayViewModel.FromModel(account),
                 PendingTransactions = pendingTransactions.Select(AccountTransactionViewModel.FromModel),
                 PostedTransactions = new PagedResult<AccountTransactionViewModel>()
                 {

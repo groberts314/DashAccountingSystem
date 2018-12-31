@@ -5,7 +5,7 @@ namespace DashAccountingSystem.Models
 {
     public class AccountDetailsViewModel
     {
-        public Account Account { get; set; }
+        public AccountDisplayViewModel Account { get; set; }
         public IEnumerable<AccountTransactionViewModel> PendingTransactions { get; set; }
         public PagedResult<AccountTransactionViewModel> PostedTransactions { get; set; }
     }
