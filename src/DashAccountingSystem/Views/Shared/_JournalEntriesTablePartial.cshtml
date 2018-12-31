@@ -43,7 +43,7 @@
                 <td style="text-align:right">
                     @if (entry.Status == TransactionStatus.Pending)
                     {
-                        <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
+                        <partial name="_JournalEntryActionLinksPartial" for="@entry" />
                     }
                     <a asp-controller="@controller"
                        asp-action="@entryDetailsAction"

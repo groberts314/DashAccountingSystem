@@ -1,0 +1,30 @@
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model INumberedJournalEntry
+
+@{
+    const string separator = " | ";
+    var tenant = ViewBag.Tenant;
+
+    if (Model.Status == TransactionStatus.Pending)
+    {
+        <a asp-route="postJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+            Post
+        </a>
+        @separator
+        <a asp-route="cancelPendingJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+            Cancel
+        </a>
+        @separator
+    }
+
+    if (Model.Status == TransactionStatus.Pending || Model.Status == TransactionStatus.Posted)
+    {
+        <a asp-route="editJournalEntry" asp-route-tenantid="@tenant.Id" asp-route-entryid="@Model.EntryId">
+            Edit
+        </a>
+        @separator
+    }
+
+    // TODO: Action Link to "Revert" a Posted Transaction ...???
+}

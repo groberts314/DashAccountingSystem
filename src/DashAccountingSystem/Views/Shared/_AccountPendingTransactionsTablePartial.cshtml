@@ -23,20 +23,20 @@
             <td>@transaction.Date.ToString("d")</td>
             <td>@transaction.Description</td>
             <td>@(transaction.CheckNumber.HasValue ? transaction.CheckNumber.ToString() : null)</td>
-            <td style="text-align:right">
+            <td style="text-align: right">
                 @if (transaction.AmountType == AmountType.Debit)
                 {
                     <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Debit.Value.ToString("N2")
                 }
             </td>
-            <td style="text-align:right">
+            <td style="text-align: right">
                 @if (transaction.AmountType == AmountType.Credit)
                 {
                     <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Credit.Value.ToString("N2")
                 }
             </td>
-            <td>
-                <partial name="_PendingJournalEntryLinksPartial" for="@transaction" />
+            <td style="text-align: right">
+                <partial name="_JournalEntryActionLinksPartial" for="@transaction" />
                 <a
                    asp-route="journalEntryDetails"
                    asp-route-tenantId="@tenant.Id"

@@ -23,9 +23,12 @@
                     <small class="asset-type text-muted">@entry.Accounts.First().AssetType</small> @entry.Accounts.Sum(a => a.Debit).ToString("N2")
                 </td>
                 <td style="text-align:right">
-                    <partial name="_PendingJournalEntryLinksPartial" for="@entry" />
+                    <partial name="_JournalEntryActionLinksPartial" for="@entry" />
 
-                    <a asp-route="journalEntryDetails" asp-route-tenantid="@tenant.Id" asp-route-entryid="@entry.EntryId">
+                    <a asp-route="journalEntryDetails"
+                       asp-route-tenantid="@tenant.Id"
+                       asp-route-entryid="@entry.EntryId"
+                    >
                         View
                     </a>
                 </td>

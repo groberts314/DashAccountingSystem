@@ -1,12 +1,8 @@
-﻿@using DashAccountingSystem.Data.Models
-@using DashAccountingSystem.Models
+﻿@using DashAccountingSystem.Models
 @model JournalEntryDetailedViewModel
 @{
     ViewData["Title"] = "Journal Entry Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var tenant = ViewBag.Tenant;
-    var isPending = Model.Status == TransactionStatus.Pending;
 }
 
 <partial name="_TenantMastheadAndNavPartial" />
@@ -14,10 +10,8 @@
 <partial name="_JournalEntryAccountsPartial" />
 <hr />
 <div style="margin-top: 11px">
-    @if (isPending)
-    {
-        <partial name="_PendingJournalEntryLinksPartial" />
-    }
+
+    <partial name="_JournalEntryActionLinksPartial" />
 
     <a href="javascript:history.go(-1)">
         Back to Journal
