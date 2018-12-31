@@ -1,4 +1,5 @@
 ﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Extensions
 @using DashAccountingSystem.Models
 @model AccountDetailsViewModel
 
@@ -6,7 +7,7 @@
     var account = Model.Account;
     ViewData["Title"] = account.AccountNumber + " - " + account.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
+
     const string amountFormat = "#,##0.00;(#,##0.00)";
 
     var pendingDebits = account.PendingDebits ?? 0.0m;
@@ -19,7 +20,7 @@
 
 <partial name="~/Views/Shared/_TenantMastheadAndNavPartial.cshtml" />
 
-<div style="margin: 22px auto 22px 22px">
+<div style="margin: 22px auto">
     <a asp-route="editAccount"
        asp-route-tenantid="@account.TenantId"
        asp-route-accountid="@account.Id">
@@ -27,6 +28,8 @@
     </a> |
     <a asp-route="accountsIndex" asp-route-tenantid="@account.TenantId">Back to List</a>
 </div>
+
+<h4>Summary</h4>
 
 <div>
     <dl class="dl-horizontal account-meta-data">
@@ -43,7 +46,7 @@
     </dl>
 </div>
 
-<table class="table table-condensed table-striped meta-data-table">
+<table class="table table-condensed table-striped meta-data-table" style="margin-bottom:22px">
     <tbody>
         <tr>
             <td>Current Balance</td>
@@ -71,3 +74,14 @@
         </tr>
     </tbody>
 </table>
+
+<h4>Pending Transactions</h4>
+@if (!Model.PendingTransactions.HasAny())
+{
+    <p>There are no pending journal entries</p>
+}
+else
+{
+    <partial name="_AccountPendingTransactionsTablePartial" for="PendingTransactions" />
+}
+

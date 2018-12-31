@@ -64,27 +64,7 @@ namespace DashAccountingSystem.Data.Repositories
 
         }
 
-        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsAsync(int accountId, int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByDateRangeAsync(int accountId, DateTime dateRangeStart, DateTime dateRangeEnd)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByMonthAsync(int accountId, int year, byte month)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByPeriodAsync(int accountId, int accountingPeriodId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<JournalEntryAccount>> GetPostedTransactionsByQuarterAsync(int accountId, int year, byte quarter)
+        public Task<PagedResult<JournalEntryAccount>> GetPostedTransactionsAsync(int accountId, Pagination pagination)
         {
             throw new NotImplementedException();
         }

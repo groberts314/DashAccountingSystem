@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using DashAccountingSystem.Data.Models;
 
 namespace DashAccountingSystem.Models
 {
-    public class JournalEntryDetailedViewModel : JournalEntryBaseViewModel
+    public class JournalEntryDetailedViewModel : JournalEntryBaseViewModel, INumberedJournalEntry
     {
         public int EntryId { get; set; }
 

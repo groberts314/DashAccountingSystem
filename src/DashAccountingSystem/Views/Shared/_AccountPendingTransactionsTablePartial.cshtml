@@ -1,0 +1,51 @@
+﻿@using DashAccountingSystem.Data.Models
+@using DashAccountingSystem.Models
+@model IEnumerable<AccountTransactionViewModel>
+@{ 
+    var tenant = ViewBag.Tenant as Tenant;
+}
+
+<table class="table table-striped acct-tx-table">
+    <thead>
+        <tr>
+            <th class="col-md-1">Date</th>
+            <th class="col-md-4 col-lg-6">Description</th>
+            <th class="col-md-1">Check #</th>
+            <th class="col-md-2 col-lg-1">Debit</th>
+            <th class="col-md-2 col-lg-1">Credit</th>
+            <th class="col-md-3 col-lg-2"></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var transaction in Model)
+    {
+        <tr>
+            <td>@transaction.Date.ToString("d")</td>
+            <td>@transaction.Description</td>
+            <td>@(transaction.CheckNumber.HasValue ? transaction.CheckNumber.ToString() : null)</td>
+            <td style="text-align:right">
+                @if (transaction.AmountType == AmountType.Debit)
+                {
+                    <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Debit.Value.ToString("N2")
+                }
+            </td>
+            <td style="text-align:right">
+                @if (transaction.AmountType == AmountType.Credit)
+                {
+                    <small class="asset-type text-muted">@transaction.AssetType</small> @transaction.Credit.Value.ToString("N2")
+                }
+            </td>
+            <td>
+                <partial name="_PendingJournalEntryLinksPartial" for="@transaction" />
+                <a
+                   asp-route="journalEntryDetails"
+                   asp-route-tenantId="@tenant.Id"
+                   asp-route-entryId="@transaction.EntryId"
+                >
+                    View
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

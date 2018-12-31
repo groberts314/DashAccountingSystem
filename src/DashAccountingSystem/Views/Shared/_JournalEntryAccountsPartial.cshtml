@@ -7,16 +7,6 @@
         .OrderBy(a => a.AmountType == AmountType.Debit ? 0 : 1)
         .ThenBy(a => a.AccountName);
 
-    Func<JournalEntryAccountViewModel, AmountType, string> showAmount = (account, type) =>
-    {
-        if (type == account.AmountType)
-        {
-            return $"{account.AssetType} {(type == AmountType.Debit ? account.Debit : account.Credit).ToString("N2")}";
-        }
-
-        return null;
-    };
-
     <div class="row journal-entry-accounts">
         <div class="col-xs-12 col-md-10 col-lg-9">
             <div class="panel-body">

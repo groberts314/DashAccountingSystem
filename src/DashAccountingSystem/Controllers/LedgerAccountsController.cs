@@ -46,7 +46,11 @@ namespace DashAccountingSystem.Controllers
         [HttpGet]
         [Route("Ledger/{tenantId:int}/Accounts/{accountId:int}", Name = "accountDetails")]
         [TenantViewDataFilter]
-        public async Task<IActionResult> AccountDetails(int tenantId, int accountId)
+        [PaginationValidationFilter]
+        public async Task<IActionResult> AccountDetails(
+            [FromRoute] int tenantId,
+            [FromRoute] int accountId,
+            [FromQuery] PaginationViewModel pagination)
         {
             // TODO: Either in here or in an attribute, verify authorization for the tenant
             var account = await _accountRepository.GetAccountByIdAsync(accountId);
@@ -55,12 +59,15 @@ namespace DashAccountingSystem.Controllers
 
             // TODO: If doesn't belong to selected tenant either 404 not found or 403 forbidden
 
-            // TODO: Get pending and recently posted transactions and use an enhanced view model
-            //       instead of raw Account model
+            // Get pending transactions
+            var pendingTransactions = await _accountRepository.GetPendingTransactionsAsync(accountId);
+
+            // TODO: Get posted transactions
 
             var resultViewModel = new AccountDetailsViewModel()
             {
-                Account = account
+                Account = account,
+                PendingTransactions = pendingTransactions.Select(AccountTransactionViewModel.FromModel)
             };
 
             return View(resultViewModel);
